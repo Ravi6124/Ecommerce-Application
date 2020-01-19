@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Ecommerce Application</string>
+    <string name="home">HomeButton</string>
+    <string name="cart">CartButton</string>
 </resources>
