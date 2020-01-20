@@ -1,4 +1,4 @@
-package com.example.ecommerceapplication.pojos;
+package com.example.ecommerceapplication.homeActivity.models;
 
 //import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
@@ -19,6 +19,7 @@ public class Category {
 
 	@SerializedName("attributeList")
 	private List<String> attributeList;
+
 
 	public List<String> getAttributeList() {
 		return attributeList;
@@ -56,7 +57,8 @@ public class Category {
  	public String toString(){
 		return 
 			"Category{" +
-			"imageURL = '" + imageURL + '\'' + 
+			"imageURL = '" + imageURL + '\'' +
+			",attributeList = '" + attributeList + '\'' +
 			",name = '" + name + '\'' + 
 			",categoryId = '" + categoryId + '\'' + 
 			"}";

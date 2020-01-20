@@ -1,6 +1,6 @@
-package com.example.ecommerceapplication.api;
+package com.example.ecommerceapplication.productListActivity.apiInterface;
 
-import com.example.ecommerceapplication.pojos.Product;
+import com.example.ecommerceapplication.productListActivity.models.Product;
 
 import java.util.List;
 

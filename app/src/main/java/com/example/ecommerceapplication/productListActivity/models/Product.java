@@ -1,4 +1,4 @@
-package com.example.ecommerceapplication.pojos;
+package com.example.ecommerceapplication.productListActivity.models;
 
 //import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
@@ -30,9 +30,21 @@ public class Product {
 	@SerializedName("defaultMerchantId")
 	private String defaultMerchantId;
 
+	@SerializedName("totalStock")
+	private int totalStock;
+
 //	@SerializedName("numberOfRatings")
 //	private int numberOfRatings;
 
+
+
+	public int getTotalStock() {
+		return totalStock;
+	}
+
+	public void setTotalStock(int totalStock) {
+		this.totalStock = totalStock;
+	}
 
 	public String getDefaultMerchantId() {
 		return defaultMerchantId;
@@ -98,6 +110,20 @@ public class Product {
 		return categoryId;
 	}
 
+	@Override
+	public String toString() {
+		return "Product{" +
+				"defaultPrice=" + defaultPrice +
+				", productId='" + productId + '\'' +
+				", imageURL='" + imageURL + '\'' +
+				", name='" + name + '\'' +
+				", description='" + description + '\'' +
+				", categoryId='" + categoryId + '\'' +
+				", defaultMerchantId='" + defaultMerchantId + '\'' +
+				", totalStock=" + totalStock +
+				'}';
+	}
+
 //	public void setNumberOfRatings(int numberOfRatings){
 //		this.numberOfRatings = numberOfRatings;
 //	}
@@ -106,16 +132,4 @@ public class Product {
 //		return numberOfRatings;
 //	}
 
-	@Override
- 	public String toString(){
-		return 
-			"Product{" +
-			"defaultPrice = '" + defaultPrice + '\'' + 
-			",productId = '" + productId + '\'' +
-			",imageURL = '" + imageURL + '\'' + 
-			",name = '" + name + '\'' + 
-			",description = '" + description + '\'' + 
-			",categoryId = '" + categoryId + '\'' +
-			"}";
-		}
 }

@@ -1,4 +1,4 @@
-package com.example.ecommerceapplication;
+package com.example.ecommerceapplication.productListActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -7,9 +7,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.ecommerceapplication.adaptors.ProductsAdapter;
-import com.example.ecommerceapplication.api.ProductInterface;
-import com.example.ecommerceapplication.pojos.Product;
+import com.example.ecommerceapplication.ProductInfoActivity;
+import com.example.ecommerceapplication.R;
+import com.example.ecommerceapplication.RetrofitClass;
+import com.example.ecommerceapplication.productListActivity.adaptor.ProductsAdapter;
+import com.example.ecommerceapplication.productListActivity.apiInterface.ProductInterface;
+import com.example.ecommerceapplication.productListActivity.models.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,6 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
 
         Intent intent = getIntent();
         String categoryId = intent.getStringExtra("cId");
-
 
         recyclerView = findViewById(R.id.recycler_view_landing);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
@@ -61,17 +63,21 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
 
     @Override
     public void onClick(Product product) {
-        Intent intent = new Intent(ProductListActivity.this,ProductDescriptionActivity.class);
+        Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
         //create bundle
         Bundle bundle = new Bundle();
         bundle.putString("name",product.getName());
         bundle.putString("description",product.getDescription());
         bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
+        bundle.putDouble("defaultPrice",product.getDefaultPrice());
 //        bundle.putDouble("average",product.getAverageProductRating());
 //        bundle.putInt("numberOfRatings",product.getNumberOfRatings());
         bundle.putString("imageURL",product.getImageURL());
-        bundle.putString("cId",product.getCategoryId());
+        bundle.putString("categoryId",product.getCategoryId());
+        bundle.putString("productId",product.getProductId());
+        bundle.putInt("totalStock",product.getTotalStock());
         intent.putExtras(bundle);
+        startActivity(intent);
         //intent.putExtra("cId",product.getImageURL());
 
 

@@ -2,4 +2,6 @@
     <string name="app_name">Ecommerce Application</string>
     <string name="home">HomeButton</string>
     <string name="cart">CartButton</string>
+    <string name="checkout">CHECKOUT</string>
+    <string name="cartHeader">Your Orders</string>
 </resources>
