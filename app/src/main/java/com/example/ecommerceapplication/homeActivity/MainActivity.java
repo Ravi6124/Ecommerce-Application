@@ -1,4 +1,4 @@
-package com.example.ecommerceapplication;
+package com.example.ecommerceapplication.homeActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.ecommerceapplication.adaptors.LandingAdapter;
-import com.example.ecommerceapplication.api.CategoryInterface;
-import com.example.ecommerceapplication.pojos.Category;
+import com.example.ecommerceapplication.productListActivity.ProductListActivity;
+import com.example.ecommerceapplication.R;
+import com.example.ecommerceapplication.RetrofitClass;
+import com.example.ecommerceapplication.homeActivity.adaptor.LandingAdapter;
+import com.example.ecommerceapplication.homeActivity.apiInterface.CategoryInterface;
+import com.example.ecommerceapplication.homeActivity.models.Category;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recycler_view_landing);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
         retrofit =  retrofitClass.getRetrofit();
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
         call.enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                Log.d("Response :",response.body().toString());
                 categoryList = response.body();
                 mAdapter = new LandingAdapter(MainActivity.this,categoryList,MainActivity.this);
                 recyclerView.setAdapter(mAdapter);
@@ -57,8 +61,11 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
 
     @Override
     public void onClick(Category category) {
-        Intent intent = new Intent(MainActivity.this,ProductListActivity.class);
+        Intent intent = new Intent(MainActivity.this, ProductListActivity.class);
         intent.putExtra("cId",category.getCategoryId());
+
+        //This should start the ProductList activity
+        startActivity(intent);
 
     }
 }

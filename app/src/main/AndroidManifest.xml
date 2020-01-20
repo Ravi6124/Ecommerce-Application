@@ -10,16 +10,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:name=".RetrofitClass"
         android:theme="@style/AppTheme">
-        <activity android:name=".productInfoActivity.ProductInfoActivity"></activity>
-        <activity android:name=".ProductListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".cartActivity.CartActivity"></activity>
+        <activity android:name=".ProductInfoActivity" />
+        <activity android:name=".productListActivity.ProductListActivity"></activity>
+        <activity android:name=".homeActivity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
