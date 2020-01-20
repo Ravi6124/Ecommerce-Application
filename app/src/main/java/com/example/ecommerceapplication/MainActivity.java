@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
     private List<Category> categoryList = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
     private RetrofitClass retrofitClass = new RetrofitClass();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
