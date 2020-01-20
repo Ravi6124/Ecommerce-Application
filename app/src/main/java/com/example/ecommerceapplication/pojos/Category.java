@@ -3,6 +3,8 @@ package com.example.ecommerceapplication.pojos;
 //import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 //@Generated("com.robohorse.robopojogenerator")
 public class Category {
 
@@ -14,6 +16,17 @@ public class Category {
 
 	@SerializedName("categoryId")
 	private String categoryId;
+
+	@SerializedName("attributeList")
+	private List<String> attributeList;
+
+	public List<String> getAttributeList() {
+		return attributeList;
+	}
+
+	public void setAttributeList(List<String> attributeList) {
+		this.attributeList = attributeList;
+	}
 
 	public void setImageURL(String imageURL){
 		this.imageURL = imageURL;
