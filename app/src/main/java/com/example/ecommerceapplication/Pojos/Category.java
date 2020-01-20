@@ -1,9 +1,10 @@
-package com.example.ecommerceapplication.Pojos;
+package com.example.ecommerceapplication.pojos;
 
+//import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
-
-public class Category{
+//@Generated("com.robohorse.robopojogenerator")
+public class Category {
 
 	@SerializedName("imageURL")
 	private String imageURL;
@@ -41,7 +42,7 @@ public class Category{
 	@Override
  	public String toString(){
 		return 
-			"Category{" + 
+			"Category{" +
 			"imageURL = '" + imageURL + '\'' + 
 			",name = '" + name + '\'' + 
 			",categoryId = '" + categoryId + '\'' + 
