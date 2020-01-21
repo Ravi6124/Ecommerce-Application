@@ -5,17 +5,19 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".RetrofitClass"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:name=".RetrofitClass"
-        android:theme="@style/AppTheme">
-        <activity android:name=".cartActivity.CartActivity"></activity>
-        <activity android:name=".ProductInfoActivity" />
-        <activity android:name=".productListActivity.ProductListActivity"></activity>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".ProfileActivity.ProfileActivity"></activity>
+        <activity android:name=".loginActivity.LoginActivity" />
+        <activity android:name=".cartActivity.CartActivity" />
+        <activity android:name=".productListActivity.ProductListActivity" />
+        <activity android:name=".productInfoActivity.ProductInfoActivity" />
         <activity android:name=".homeActivity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

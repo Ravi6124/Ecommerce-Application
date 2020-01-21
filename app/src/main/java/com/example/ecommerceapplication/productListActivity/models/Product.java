@@ -18,7 +18,7 @@ public class Product {
 	@SerializedName("imageURL")
 	private String imageURL;
 
-	@SerializedName("name")
+	@SerializedName("productName")
 	private String name;
 
 	@SerializedName("description")

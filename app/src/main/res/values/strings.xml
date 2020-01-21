@@ -4,4 +4,10 @@
     <string name="cart">CartButton</string>
     <string name="checkout">CHECKOUT</string>
     <string name="cartHeader">Your Orders</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">LogIn</string>
+    <string name="signup">SignUp</string>
+    <string name="user">Guest</string>
+    <string name="preference_file_key">Custom Login</string>
 </resources>

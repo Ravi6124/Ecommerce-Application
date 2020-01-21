@@ -7,21 +7,21 @@
     tools:context=".homeActivity.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="409dp"
+        android:layout_height="92dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <SearchView
             android:id="@+id/search_bar"
-            android:layout_width="201dp"
-            android:layout_height="63dp"
+            android:layout_width="217dp"
+            android:layout_height="54dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.355"
+            app:layout_constraintHorizontal_bias="0.271"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,13 +41,33 @@
             android:id="@+id/imageButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:contentDescription="@string/cart"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.238"
+            app:layout_constraintHorizontal_bias="0.266"
             app:layout_constraintStart_toEndOf="@id/search_bar"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_cart" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/login"
+            app:layout_constraintStart_toEndOf="@id/imageButton2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_person_black_24dp" />
+
+        <TextView
+            android:id="@+id/user_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="28dp"
+            android:text="@string/user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageButton3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -57,9 +77,22 @@
         android:layout_width="412dp"
         android:layout_height="559dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="-1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.97" />
+
+    <Spinner
+        android:id="@+id/drop_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="344dp"
+        android:layout_marginBottom="40dp"
+        android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_view_landing"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_drop_down" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
