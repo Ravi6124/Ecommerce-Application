@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context=".MainActivity">
+    tools:context=".productInfoActivity.ProductInfoActivity">
 
     <Button
         android:id="@+id/buyNowButton"
@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="232dp"
         android:layout_marginTop="344dp"
-        android:text="Buy Now"
+        android:text="@string/buy_now"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/productImage" />
 
@@ -68,6 +68,7 @@
         android:layout_height="195dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
+        android:contentDescription="@string/product_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         tools:srcCompat="@tools:sample/avatars" />
@@ -76,10 +77,10 @@
         android:id="@+id/productName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="20dp"
-        android:text="Product Name"
-        android:textSize="20dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="44dp"
+        android:text="@string/product_name"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
@@ -89,7 +90,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="346dp"
-        android:text="Add To Cart"
+        android:text="@string/addtocart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/productImage" />
 
@@ -97,49 +98,120 @@
         android:id="@+id/price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="204dp"
         android:layout_marginTop="32dp"
-        android:text="Price(Replace by cost)"
-        android:textSize="18dp"
+        android:text="@string/price"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/productImage" />
 
     <TextView
         android:id="@+id/productDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="174dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="179dp"
-        android:text="Description"
+        android:layout_marginTop="84dp"
+        android:text="@string/description"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/price" />
 
     <TextView
-        android:id="@+id/textView5"
-        android:layout_width="319dp"
-        android:layout_height="166dp"
+        android:id="@+id/color"
+        android:layout_width="68dp"
+        android:layout_height="29dp"
         android:layout_marginStart="46dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="46dp"
+        android:layout_marginTop="52dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/productDescription" />
 
-    <Spinner
-        android:id="@+id/merchantList"
-        android:layout_width="170dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="20dp"
+
+    <TextView
+        android:id="@+id/theme"
+        android:layout_width="68dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="88dp"
+        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productDescription" />
+
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="68dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="128dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productDescription" />
+
+    <Button
+        android:id="@+id/merchantList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="112dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/moremerchnat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/productImage"
         app:layout_constraintTop_toBottomOf="@+id/productName" />
+
+    <TextView
+        android:id="@+id/productRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="72dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/productRatingText"
+        app:layout_constraintTop_toBottomOf="@id/productImage" />
+
+    <TextView
+        android:id="@+id/priceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="32dp"
+        android:textSize="18sp"
+        android:text="@string/product_price"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productImage"
+        tools:text="@string/price" />
+
+    <TextView
+        android:id="@+id/productRatingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/rating"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/priceText" />
+
+    <TextView
+        android:id="@+id/merchant_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="36dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/productImage"
+        app:layout_constraintTop_toBottomOf="@id/productName" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

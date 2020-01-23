@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ecommerceapplication">
+    package="com.example.ecom">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,7 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ProfileActivity.ProfileActivity"></activity>
+        <activity android:name=".merchantActivity.MerchantActivity"></activity>
+        <activity android:name=".signupActivity.SignUpActivity" />
+        <activity android:name=".signupActivity.models.SignUpActivity" />
+        <activity android:name=".ProfileActivity.ProfileActivity" />
         <activity android:name=".loginActivity.LoginActivity" />
         <activity android:name=".cartActivity.CartActivity" />
         <activity android:name=".productListActivity.ProductListActivity" />
