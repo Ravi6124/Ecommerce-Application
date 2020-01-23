@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -125,18 +126,20 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
     public void onClick(ContentItem product) {
         Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
         //create bundle
-        Bundle bundle = new Bundle();
-        bundle.putString("name",product.getProductName());
-        bundle.putString("description",product.getDescription());
-        bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
-        bundle.putDouble("defaultPrice",product.getDefaultPrice());
+        SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = shared.edit();
+        editor.putString("name",product.getProductName());
+        editor.putString("description",product.getDescription());
+        editor.putString("defaultMerchantId",product.getDefaultMerchantId());
+        String price = String.valueOf(product.getDefaultPrice());
+        editor.putString("defaultPrice",price);
 //        bundle.putDouble("average",product.getAverageProductRating());
 //        bundle.putInt("numberOfRatings",product.getNumberOfRatings());
-        bundle.putString("imageURL",product.getImageURL());
-        bundle.putString("categoryId",product.getCategoryId());
-        bundle.putString("productId",product.getProductId());
-        bundle.putInt("totalStock",product.getTotalStock());
-        intent.putExtras(bundle);
+        editor.putString("imageURL",product.getImageURL());
+        editor.putString("categoryId",product.getCategoryId());
+        editor.putString("productId",product.getProductId());
+        editor.putInt("totalStock",product.getTotalStock());
+        editor.apply();
         startActivity(intent);
         //intent.putExtra("cId",product.getImageURL());
 

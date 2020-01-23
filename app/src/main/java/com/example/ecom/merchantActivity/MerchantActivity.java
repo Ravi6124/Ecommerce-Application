@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,6 +18,7 @@ import com.example.ecom.productInfoActivity.ProductInfoActivity;
 
 import java.util.List;
 
+import io.reactivex.annotations.NonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,7 +39,7 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         Intent intent = getIntent();
         String productId = intent.getStringExtra("productId");
 
-        recyclerView = findViewById(R.id.recycler_view_landing);
+        recyclerView = findViewById(R.id.recycler_view_merchant);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
@@ -48,14 +50,14 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         Call<List<MerchantResponse>> call = merchantInterface.getMerchantFromProductId(productId);
         call.enqueue(new Callback<List<MerchantResponse>>() {
             @Override
-            public void onResponse(Call<List<MerchantResponse>> call, Response<List<MerchantResponse>> response) {
+            public void onResponse(@NonNull Call<List<MerchantResponse>> call, @NonNull Response<List<MerchantResponse>> response) {
                 merchantList = response.body();
                 mAdapter = new MerchantAdaptor(MerchantActivity.this,merchantList,MerchantActivity.this);
                 recyclerView.setAdapter(mAdapter);
             }
 
             @Override
-            public void onFailure(Call<List<MerchantResponse>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MerchantResponse>> call, Throwable t) {
                 Log.d("MerchantResponse:","failure");
             }
         });
@@ -65,13 +67,16 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
     @Override
     public void onClick(MerchantResponse merchantResponse) {
         Intent intent = new Intent(MerchantActivity.this, ProductInfoActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("merchantName",merchantResponse.getMerchantName());
-        bundle.putString("color",merchantResponse.getColor());
-        bundle.putString("size",merchantResponse.getSize());
-        bundle.putString("cost",String.valueOf(merchantResponse.getCost()));
-        bundle.putString("rating",String.valueOf(merchantResponse.getProductRating()));
-        intent.putExtras(bundle);
+
+        SharedPreferences sharedPref = getSharedPreferences("merchant_product_info", MODE_PRIVATE);
+        SharedPreferences.Editor editorMerchant = sharedPref.edit();
+        String color = merchantResponse.getColor();
+        editorMerchant.putString("merchantName",merchantResponse.getMerchantName());
+        editorMerchant.putString("color",merchantResponse.getColor());
+        editorMerchant.putString("size",merchantResponse.getSize());
+        editorMerchant.putString("cost",String.valueOf(merchantResponse.getCost()));
+        editorMerchant.putString("rating",String.valueOf(merchantResponse.getProductRating()));
+        editorMerchant.commit();
         startActivity(intent);
     }
 }

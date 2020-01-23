@@ -30,7 +30,8 @@ public class MerchantAdaptor extends RecyclerView.Adapter<MerchantAdaptor.MyView
         public MyViewHolder(View v) {
             super(v);
             //imageView = v.findViewById(R.id.categoryImage);
-            textView = v.findViewById(R.id.categoryText);
+            textView = v.findViewById(R.id.merchant_name);
+            merhcantRating = v.findViewById(R.id.merchant_rating);
         }
     }
 

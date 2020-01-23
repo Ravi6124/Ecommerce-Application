@@ -10,6 +10,6 @@ import retrofit2.http.Path;
 
 public interface MerchantInterface {
 
-    @GET("/getMerchantByProductId/{productId}")
+    @GET("/productListingController/getMerchantByProductId/{productId}")
     Call<List<MerchantResponse>> getMerchantFromProductId(@Path("productId") String productId);
 }

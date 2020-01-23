@@ -7,7 +7,7 @@
     tools:context=".merchantActivity.MerchantActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_landing"
+        android:id="@+id/recycler_view_merchant"
         android:layout_width="412dp"
         android:layout_height="559dp"
         app:layout_constraintBottom_toBottomOf="parent"

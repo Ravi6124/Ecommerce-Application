@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.ecom.R;
@@ -39,6 +41,7 @@ public class ProductInfoActivity extends AppCompatActivity {
 //    private Button btnAddTocart;
 //    private Button btnBuyNow;
 
+    private AddProductToCartResponse addProductToCartResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,18 +63,20 @@ public class ProductInfoActivity extends AppCompatActivity {
         final String defaultMerchantId ;
         final String description;
         final String imageURL;
-        final double defaultPrice;
+        final Double defaultPrice;
         final String categoryId;
+
+        SharedPreferences shared = getSharedPreferences("productInfo", MODE_PRIVATE);
 
 //        if (extras != null) {
             //Storing the values from bundle in the local
-            name = extras.getString("name","");
-            productId = extras.getString("productId","");
-            defaultMerchantId = extras.getString("defaultMerchantId","");
-            description = extras.getString("description","");
-            imageURL  = extras.getString("imageURL","");
-            defaultPrice = extras.getDouble("defaultPrice",0);
-            categoryId = extras.getString("categoryId","");
+            name = shared.getString("name","");
+            productId = shared.getString("productId","");
+            defaultMerchantId = shared.getString("defaultMerchantId","");
+            description = shared.getString("description","");
+            imageURL  = shared.getString("imageURL","");
+            defaultPrice = Double.parseDouble(shared.getString("defaultPrice",""));
+            categoryId = shared.getString("categoryId","");
 
             //Setting the page components from the values recieved from the bundle
             tvProductName.setText(name);
@@ -104,6 +109,8 @@ public class ProductInfoActivity extends AppCompatActivity {
                    @Override
                    public void onResponse(@NonNull Call<AddProductToCartResponse> call, @NonNull Response<AddProductToCartResponse> response) {
                        Log.d("SignUpResponse","item added to cart");
+                       addProductToCartResponse = new AddProductToCartResponse(response.body().getResultCode(),response.body().getCart());
+                       Toast.makeText(ProductInfoActivity.this, "item added to cart", Toast.LENGTH_SHORT).show();
                    }
 
                    @Override
@@ -130,6 +137,7 @@ public class ProductInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProductInfoActivity.this, MerchantActivity.class);
+                intent.putExtra("productId",productId);
                 startActivity(intent);
             }
         });
@@ -158,19 +166,14 @@ public class ProductInfoActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Bundle extras = getIntent().getExtras();
-
-        if(null != extras) {
-            String color = extras.getString("color","");
-            String theme = extras.getString("theme","");
-            String size = extras.getString("size","");
-            String rating = extras.getString("rating","");
-            String merchantName = extras.getString("merchantName","");
+        SharedPreferences sharedPreferences = getSharedPreferences("merchant_product_info",MODE_PRIVATE);
+        if(null != sharedPreferences) {
+            String color = sharedPreferences.getString("color","");
+            String theme = sharedPreferences.getString("theme","");
+            String size = sharedPreferences.getString("size","");
+            String rating = sharedPreferences.getString("rating","");
+            String merchantName = sharedPreferences.getString("merchantName","");
 
             TextView colorVal = findViewById(R.id.color);
             TextView themeVal = findViewById(R.id.theme);
@@ -184,6 +187,14 @@ public class ProductInfoActivity extends AppCompatActivity {
             sizeVal.setText(size);
             merchantVal.setText(merchantName);
         }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
 }

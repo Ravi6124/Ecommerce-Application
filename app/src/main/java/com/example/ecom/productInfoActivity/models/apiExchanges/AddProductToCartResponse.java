@@ -11,6 +11,11 @@ public class AddProductToCartResponse{
 	@SerializedName("cart")
 	private Cart cart;
 
+	public AddProductToCartResponse(int resultCode, Cart cart) {
+		this.resultCode = resultCode;
+		this.cart = cart;
+	}
+
 	public void setResultCode(int resultCode){
 		this.resultCode = resultCode;
 	}
