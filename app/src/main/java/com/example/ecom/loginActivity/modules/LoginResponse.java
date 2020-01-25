@@ -24,6 +24,8 @@ public class LoginResponse{
 	@SerializedName("statusCode")
 	private int statusCode;
 
+
+
 	public void setEmailAddress(String emailAddress){
 		this.emailAddress = emailAddress;
 	}

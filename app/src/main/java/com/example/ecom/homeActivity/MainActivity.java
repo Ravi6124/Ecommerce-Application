@@ -66,16 +66,55 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
         RetrofitClass retrofitLogin = new RetrofitClass();
         retrofit = retrofitLogin.getRetrofit();
         LoginInterface loginInterface = retrofit.create(LoginInterface.class);
         Call<LoginResponse> call = loginInterface.guestLogin("android");
         call.enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+            public void onResponse(Call<LoginResponse> call,  Response<LoginResponse> response) {
 
                 guestId = (null!=response.body().getGuestId())?response.body().getGuestId():"Guest";
+                userId = (sharedPreferences.getString("userId",guestId));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("userId",userId);
+                editor.commit();
+                String email = sharedPreferences.getString("email","Guest");
+                userInfo = findViewById(R.id.user_info);
+                userInfo.setText(email);
+
+
+                recyclerView = findViewById(R.id.recycler_view_landing);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
+                recyclerView.setLayoutManager(gridLayoutManager);
+
+                retrofit =  retrofitClass.getRetrofit();
+                CategoryInterface categoryInterface = retrofit.create(CategoryInterface.class);
+                Call<List<Category>> callGuest = categoryInterface.getAllCategories();
+                callGuest.enqueue(new Callback<List<Category>>() {
+                    @Override
+                    public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                        categoryList = response.body();
+                        mAdapter = new LandingAdapter(MainActivity.this,categoryList,MainActivity.this);
+                        recyclerView.setAdapter(mAdapter);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Category>> call, Throwable t) {
+                        Log.d("getAllCategories"," : callback failure");
+                    }
+                });
+
+                //Search View
+
+                SearchView searchView = findViewById(R.id.search_bar);
+                SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+                ComponentName componentName = new ComponentName(MainActivity.this, SearchableActivity.class);
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+
+
             }
 
             @Override
@@ -84,11 +123,11 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
             }
         });
 
-        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
-        userId = (sharedPreferences.getString("userId",guestId));
-        String email = sharedPreferences.getString("email","Guest");
-        userInfo = findViewById(R.id.user_info);
-        userInfo.setText(email);
+//        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+//        userId = (sharedPreferences.getString("userId",guestId));
+//        String email = sharedPreferences.getString("email","Guest");
+//        userInfo = findViewById(R.id.user_info);
+//        userInfo.setText(email);
 
 
 
@@ -117,34 +156,34 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
 //            }
 //        }
 
-        recyclerView = findViewById(R.id.recycler_view_landing);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
-        recyclerView.setLayoutManager(gridLayoutManager);
-
-        retrofit =  retrofitClass.getRetrofit();
-        CategoryInterface categoryInterface = retrofit.create(CategoryInterface.class);
-        Call<List<Category>> callGuest = categoryInterface.getAllCategories();
-        callGuest.enqueue(new Callback<List<Category>>() {
-            @Override
-            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
-                categoryList = response.body();
-                mAdapter = new LandingAdapter(MainActivity.this,categoryList,MainActivity.this);
-                recyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<List<Category>> call, Throwable t) {
-                Log.d("getAllCategories"," : callback failure");
-            }
-        });
-
-        //Search View
-
-        SearchView searchView = findViewById(R.id.search_bar);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-        ComponentName componentName = new ComponentName(MainActivity.this, SearchableActivity.class);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+//        recyclerView = findViewById(R.id.recycler_view_landing);
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
+//        recyclerView.setLayoutManager(gridLayoutManager);
+//
+//        retrofit =  retrofitClass.getRetrofit();
+//        CategoryInterface categoryInterface = retrofit.create(CategoryInterface.class);
+//        Call<List<Category>> callGuest = categoryInterface.getAllCategories();
+//        callGuest.enqueue(new Callback<List<Category>>() {
+//            @Override
+//            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+//                categoryList = response.body();
+//                mAdapter = new LandingAdapter(MainActivity.this,categoryList,MainActivity.this);
+//                recyclerView.setAdapter(mAdapter);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Category>> call, Throwable t) {
+//                Log.d("getAllCategories"," : callback failure");
+//            }
+//        });
+//
+//        //Search View
+//
+//        SearchView searchView = findViewById(R.id.search_bar);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//
+//        ComponentName componentName = new ComponentName(MainActivity.this, SearchableActivity.class);
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
     }
 
     @Override

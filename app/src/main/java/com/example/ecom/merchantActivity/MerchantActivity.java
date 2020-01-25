@@ -74,7 +74,7 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         editorMerchant.putString("merchantName",merchantResponse.getMerchantName());
         editorMerchant.putString("color",merchantResponse.getColor());
         editorMerchant.putString("size",merchantResponse.getSize());
-        editorMerchant.putString("cost",String.valueOf(merchantResponse.getCost()));
+        editorMerchant.putFloat("cost",(float)merchantResponse.getCost());
         editorMerchant.putString("rating",String.valueOf(merchantResponse.getProductRating()));
         editorMerchant.putString("merchantId",merchantResponse.getMerchantId());
         editorMerchant.commit();

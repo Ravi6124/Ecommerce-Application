@@ -3,6 +3,7 @@ package com.example.ecom.loginActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -155,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // todo send data to backend for authentication
 
-                LoginRequest loginRequest = new LoginRequest(userName,password,"customer");
+                LoginRequest loginRequest = new LoginRequest(userName,password,"customer",userId);
                 RetrofitClass retrofitLogin = new RetrofitClass();
                 retrofit = retrofitLogin.getRetrofit();
                 LoginInterface loginInterface = retrofit.create(LoginInterface.class);
@@ -180,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         }
                         else {
-                            Toast.makeText(LoginActivity.this, "email already exists", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "invalid credentials", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -341,6 +342,15 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();
+        sharedPreferences = getSharedPreferences("merchant_product_info",MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = sharedPreferences.edit();
+        editor1.clear();
+        editor1.commit();
+
+        sharedPreferences = getSharedPreferences("productInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor2 = sharedPreferences.edit();
+        editor2.clear();
+        editor2.commit();
         updateUI(false);
         //setResult(RESULT_OK,);
 
@@ -374,31 +384,45 @@ public class LoginActivity extends AppCompatActivity {
             //editor.commit();
             // TODO: 2020-01-22 send the token to backend
             String token = account.getIdToken();
-            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken(),"customer");
+            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken(),"customer",userId);
             RetrofitClass retrofitLogin = new RetrofitClass();
             Retrofit retrofit = retrofitLogin.getRetrofit();
             LoginInterface loginInterface = retrofit.create(LoginInterface.class);
             Call<LoginResponse> call = loginInterface.googleLogIn(accessTokenDTO);
 
+            //progress Dialog
+            final ProgressDialog progressDoalog;
+            progressDoalog = new ProgressDialog(LoginActivity.this);
+            progressDoalog.setMax(100);
+            progressDoalog.setMessage("Its loading....");
+            progressDoalog.setTitle("ProgressDialog bar example");
+            progressDoalog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            // show it
+            progressDoalog.show();
+
             call.enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                    progressDoalog.dismiss();
+
                     loginStatus = response.body().getStatusCode();
                     String userId = response.body().getUserId();
                     editor.putString("userId",userId);
                     // TODO: 2020-01-25  do commit here and update UI here only
-                    //editor.commit();
+                    editor.commit();
+                    updateUI(true);
                    // setResult(RESULT_OK,);
                 }
 
                 @Override
                 public void onFailure(Call<LoginResponse> call, Throwable t) {
+                    progressDoalog.dismiss();
                     Log.d("Authorization","not responding");
                 }
             });
-            editor.commit();
+            //editor.commit();
             // Signed in successfully, show authenticated UI.
-            updateUI(true);
+            //updateUI(true);
             Log.d("loginStatus",String.valueOf(loginStatus));
             Log.d("token",token);
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -410,8 +434,7 @@ public class LoginActivity extends AppCompatActivity {
             //editor.commit will write to persistence data and apply will handle in the background
 //            editor.apply();                   s
             setResult(RESULT_OK,intent);
-
-            //startActivity(intent);
+            startActivity(intent);
             finish();
 
         } catch (ApiException e) {

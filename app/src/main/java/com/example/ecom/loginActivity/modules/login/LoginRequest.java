@@ -4,11 +4,21 @@ public class LoginRequest{
 	private String emailAddress;
 	private String password;
 	private String role;
+	private String guestId;
 
-	public LoginRequest(String emailAddress, String password, String role) {
+	public LoginRequest(String emailAddress, String password, String role, String guestId) {
 		this.emailAddress = emailAddress;
 		this.password = password;
 		this.role = role;
+		this.guestId = guestId;
+	}
+
+	public String getGuestId() {
+		return guestId;
+	}
+
+	public void setGuestId(String guestId) {
+		this.guestId = guestId;
 	}
 
 	public void setEmailAddress(String emailAddress){

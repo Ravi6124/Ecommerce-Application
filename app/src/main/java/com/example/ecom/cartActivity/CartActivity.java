@@ -43,6 +43,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
     private RetrofitClass retrofitClass = new RetrofitClass();
     private Button checkoutBtn ;
     private Context context;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +54,12 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         retrofit = retrofitClass.getRetrofit();
+
+        SharedPreferences  sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId","");
+
         CartInterface cartInterface = retrofit.create(CartInterface.class);
-        Call<CartProductRevised> call = cartInterface.getFromCart( "fakeId");
+        Call<CartProductRevised> call = cartInterface.getFromCart( userId);
 
         call.enqueue(new Callback<CartProductRevised>() {
             @Override

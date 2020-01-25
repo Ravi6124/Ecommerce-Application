@@ -3,6 +3,7 @@ package com.example.ecom.cartActivity.adaptor;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyViewHolder>{
     private CartProductRevised cartProductRevised;
     private Context context;
     private CartInterface cartInterface;
+    private SharedPreferences sharedPreferences;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         // each data item is just an integer in this case
@@ -113,8 +115,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyViewHolder>{
                 String defaultMerchantId = item.getMerchanrId();
                 double defaultPrice = item.getPrice();
                 String name = item.getProductName();
+                sharedPreferences = context.getSharedPreferences("UserInfo",Context.MODE_PRIVATE);
+                String userId = sharedPreferences.getString("userId","");
                 CartProduct cartProduct = new CartProduct(1,imageURL,productId,defaultMerchantId,defaultPrice,name);
-                AddProductToCartRequest addProductToCart = new AddProductToCartRequest("fakeId",cartProduct);
+                AddProductToCartRequest addProductToCart = new AddProductToCartRequest(userId,cartProduct);
 
                 // TODO: 2020-01-22 for now different retrofit class for differnet services
 //                RetrofitClass retrofitClass = new RetrofitClass();

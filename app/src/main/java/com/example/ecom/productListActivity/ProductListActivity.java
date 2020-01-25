@@ -146,8 +146,8 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
         editor.putString("name",product.getProductName());
         editor.putString("description",product.getDescription());
         editor.putString("defaultMerchantId",product.getDefaultMerchantId());
-        String price = String.valueOf(product.getDefaultPrice());
-        editor.putString("defaultPrice",price);
+        Float price = (float)product.getDefaultPrice();
+        editor.putFloat("defaultPrice",price);
 //        bundle.putDouble("average",product.getAverageProductRating());
 //        bundle.putInt("numberOfRatings",product.getNumberOfRatings());
         editor.putString("imageURL",product.getImageURL());

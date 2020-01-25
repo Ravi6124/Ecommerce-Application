@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 
 public interface CategoryInterface {
 
-    @GET("product/product/category")
+    @GET("/product/product/category")
     Call<List<Category>> getAllCategories();
 }

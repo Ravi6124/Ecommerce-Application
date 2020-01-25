@@ -10,6 +10,9 @@ public class AccessTokenDTO {
     @SerializedName("role")
     String role;
 
+    @SerializedName("guestId")
+    String guestId;
+
     public String getRole() {
         return role;
     }
@@ -18,9 +21,10 @@ public class AccessTokenDTO {
         this.role = role;
     }
 
-    public AccessTokenDTO(String accessToken, String role) {
+    public AccessTokenDTO(String accessToken, String role, String guestId) {
         this.accessToken = accessToken;
         this.role = role;
+        this.guestId = guestId;
     }
 
     public String getAccessToken() {

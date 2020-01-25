@@ -13,15 +13,17 @@ import retrofit2.http.Query;
 
 public interface LoginInterface {
 
-    @POST("/login/login/googlelogin")
+    @POST("login/login/googlelogin")
     Call<LoginResponse> googleLogIn(@Body AccessTokenDTO accessTokenDTO);
 
-    @POST("/login/customer")
+    // TODO: 2020-01-25 login/lgoin/facebooklogin 
+
+    @POST("login/customer")
     Call<SignUpResponse> register(@Body SignUpRequest signUpRequest);
 
-    @POST("/login/login")
+    @POST("login/login")
     Call<LoginResponse> customLogin(@Body LoginRequest loginRequest);
 
-    @POST("/login/guest")
+    @POST("login/guest")
     Call<LoginResponse> guestLogin(@Query("type") String type);
 }
