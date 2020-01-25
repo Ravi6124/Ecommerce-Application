@@ -5,12 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.ecom.R;
@@ -22,6 +26,7 @@ import com.example.ecom.productListActivity.adaptor.ProductsAdapter;
 import com.example.ecom.productListActivity.apiInterface.ProductInterface;
 import com.example.ecom.productListActivity.models.ContentItem;
 import com.example.ecom.productListActivity.models.ProductPage;
+import com.example.ecom.searchableActivity.SearchableActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +59,14 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
         Intent intent = getIntent();
         categoryId = intent.getStringExtra("cId");
 
+        //Search View
+
+        SearchView searchView = findViewById(R.id.search_bar);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        ComponentName componentName = new ComponentName(ProductListActivity.this, SearchableActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+
         recyclerView = findViewById(R.id.recycler_view_landing);
         gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -65,7 +78,7 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
                 super.onScrolled(recyclerView, dx, dy);
                 position =  gridLayoutManager.findLastCompletelyVisibleItemPosition();
 
-                if ((position == size-1)&&(page!=totalPages-1)){
+                if ((position == productList.size()-1)&&(page!=totalPages-1)){
                     // End has been reached
                     page++;
                     apiCall(page,size);
@@ -106,12 +119,14 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
         call.enqueue(new Callback<ProductPage>() {
             @Override
             public void onResponse(Call<ProductPage> call, Response<ProductPage> response) {
+                int length = productList.size();
                 productList.addAll(response.body().getContent());
                 totalPages =  response.body().getTotalPages();
                 totalElements = response.body().getTotalElements();
                 Toast.makeText(ProductListActivity.this, "size : " + productList.size(), Toast.LENGTH_SHORT).show();
                 mAdapter = new ProductsAdapter(ProductListActivity.this,productList,ProductListActivity.this);
                 recyclerView.setAdapter(mAdapter);
+                mAdapter.notifyItemRangeInserted(length,response.body().getContent().size());
             }
 
             @Override

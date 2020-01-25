@@ -14,7 +14,7 @@ public class RetrofitClass extends Application {
     public Retrofit getRetrofit() {
         if(retrofit==null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://172.16.20.119:8082/") //base url
+                    .baseUrl("http://172.16.20.119:8091/") //base url
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(new OkHttpClient.Builder().build())
                     .build();

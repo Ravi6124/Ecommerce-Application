@@ -17,10 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.ecom.R;
 //import com.example.ecom.cartActivity.models.CartProduct;
-import com.example.ecom.RetrofitCart;
 import com.example.ecom.RetrofitClass;
 import com.example.ecom.cartActivity.CartActivity;
-import com.example.ecom.cartActivity.apiInterface.CartInterface;
 import com.example.ecom.cartActivity.models.CartProductRevised;
 import com.example.ecom.cartActivity.models.ListCartProduct;
 import com.example.ecom.cartActivity.models.removeFromCart.RemoveFromCart;
@@ -121,7 +119,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyViewHolder>{
                 // TODO: 2020-01-22 for now different retrofit class for differnet services
 //                RetrofitClass retrofitClass = new RetrofitClass();
 //                Retrofit retrofit = retrofitClass.getRetrofit();
-                RetrofitCart retrofitCart = new RetrofitCart();
+                RetrofitClass retrofitCart = new RetrofitClass();
                 Retrofit retrofit = retrofitCart.getRetrofit();
                 ProductInfoInterface productInfoInterface = retrofit.create(ProductInfoInterface.class);
 

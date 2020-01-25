@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.ecom.R;
-import com.example.ecom.RetrofitMerchant;
+import com.example.ecom.RetrofitClass;
 import com.example.ecom.merchantActivity.adaptor.MerchantAdaptor;
 import com.example.ecom.merchantActivity.apiInterface.MerchantInterface;
 import com.example.ecom.merchantActivity.models.MerchantResponse;
@@ -43,7 +43,7 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        RetrofitMerchant retrofitMerchant = new RetrofitMerchant();
+        RetrofitClass retrofitMerchant = new RetrofitClass();
         retrofit = retrofitMerchant.getRetrofit();
         MerchantInterface merchantInterface = retrofit.create(MerchantInterface.class);
 
@@ -76,6 +76,7 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         editorMerchant.putString("size",merchantResponse.getSize());
         editorMerchant.putString("cost",String.valueOf(merchantResponse.getCost()));
         editorMerchant.putString("rating",String.valueOf(merchantResponse.getProductRating()));
+        editorMerchant.putString("merchantId",merchantResponse.getMerchantId());
         editorMerchant.commit();
         startActivity(intent);
     }

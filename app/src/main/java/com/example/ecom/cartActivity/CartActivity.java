@@ -4,10 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,16 +16,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ecom.R;
-import com.example.ecom.RetrofitCart;
 import com.example.ecom.RetrofitClass;
 import com.example.ecom.cartActivity.adaptor.CartAdapter;
 import com.example.ecom.cartActivity.apiInterface.CartInterface;
 //import com.example.ecom.cartActivity.models.CartProduct;
 import com.example.ecom.cartActivity.apiInterface.CheckoutInterface;
 import com.example.ecom.cartActivity.models.CartProductRevised;
-import com.example.ecom.cartActivity.models.ListCartProduct;
 import com.example.ecom.cartActivity.models.checkout.CheckoutResponse;
 import com.example.ecom.homeActivity.MainActivity;
+import com.example.ecom.loginActivity.LoginActivity;
 
 //import java.util.ArrayList;
 //import java.util.List;
@@ -40,11 +38,9 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
 
     private RecyclerView recyclerView;
     private Retrofit retrofit;
-    //private List<CartProduct> cartProductList = new ArrayList<>();
     private CartProductRevised cartProductRevised = new CartProductRevised();
     private RecyclerView.Adapter mAdapter;
-    //private RetrofitClass retrofitClass = new RetrofitClass();
-    private RetrofitCart retrofitCart = new RetrofitCart();
+    private RetrofitClass retrofitClass = new RetrofitClass();
     private Button checkoutBtn ;
     private Context context;
 
@@ -56,11 +52,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         recyclerView = findViewById(R.id.recycler_view_landing);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-
-        // TODO: 2020-01-22 retrofit cart for now
-//        retrofit =  retrofitClass.getRetrofit();
-//        CartInterface cartInterface = retrofit.create(CartInterface.class);
-        retrofit = retrofitCart.getRetrofit();
+        retrofit = retrofitClass.getRetrofit();
         CartInterface cartInterface = retrofit.create(CartInterface.class);
         Call<CartProductRevised> call = cartInterface.getFromCart( "fakeId");
 
@@ -86,6 +78,15 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         checkoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                String userId = sharedPreferences.getString("userId","");
+                if(userId.equals("")){
+                    Intent intent = new Intent(CartActivity.this, LoginActivity.class);
+                    //startActivityForResult
+                    startActivity(intent);
+                }
+
                 CheckoutInterface checkoutInterface = retrofit.create(CheckoutInterface.class);
                 Call<CheckoutResponse> callCheckout = checkoutInterface.checkout(cartProductRevised);
                 callCheckout.enqueue(new Callback<CheckoutResponse>() {

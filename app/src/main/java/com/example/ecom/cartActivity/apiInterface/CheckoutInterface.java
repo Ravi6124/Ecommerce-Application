@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 
 public interface CheckoutInterface {
 
-    @POST("/cartapi/order/place")
+    @POST("/cartandorder/order/place")
     Call<CheckoutResponse> checkout(@Body CartProductRevised cart);
 
 

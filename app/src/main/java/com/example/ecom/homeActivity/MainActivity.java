@@ -1,10 +1,14 @@
 package com.example.ecom.homeActivity;
 
 //import androidx.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,19 +19,22 @@ import android.view.View;
 //import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 //import android.widget.Spinner;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //import com.example.ecom.ProfileActivity.ProfileActivity;
 import com.example.ecom.cartActivity.CartActivity;
 import com.example.ecom.loginActivity.LoginActivity;
+import com.example.ecom.loginActivity.apiInterface.LoginInterface;
+import com.example.ecom.loginActivity.modules.LoginResponse;
 import com.example.ecom.productListActivity.ProductListActivity;
 import com.example.ecom.R;
 import com.example.ecom.RetrofitClass;
 import com.example.ecom.homeActivity.adaptor.LandingAdapter;
 import com.example.ecom.homeActivity.apiInterface.CategoryInterface;
 import com.example.ecom.homeActivity.models.Category;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.example.ecom.searchableActivity.SearchableActivity;
 //import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 //import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 //import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,45 +55,67 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
     private List<Category> categoryList = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
     private RetrofitClass retrofitClass = new RetrofitClass();
+    SharedPreferences sharedPreferences;
+    TextView userInfo;
+    String guestId;
+    private String userId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Spinner dropdown = findViewById(R.id.drop_down);
-//        String items[] = new String[]{"Sign Out","Profile"};
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,items);
-//        dropdown.setAdapter(adapter);
+
+        RetrofitClass retrofitLogin = new RetrofitClass();
+        retrofit = retrofitLogin.getRetrofit();
+        LoginInterface loginInterface = retrofit.create(LoginInterface.class);
+        Call<LoginResponse> call = loginInterface.guestLogin("android");
+        call.enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+
+                guestId = (null!=response.body().getGuestId())?response.body().getGuestId():"Guest";
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                Log.d("GuestApi:","callback failure");
+            }
+        });
+
+        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+        userId = (sharedPreferences.getString("userId",guestId));
+        String email = sharedPreferences.getString("email","Guest");
+        userInfo = findViewById(R.id.user_info);
+        userInfo.setText(email);
+
 
 
         //getting signed user account information
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
-            String personName = acct.getDisplayName();
-//            String personGivenName = acct.getGivenName();
-//            String personFamilyName = acct.getFamilyName();
-//            String personEmail = acct.getEmail();
-//            String personId = acct.getId();
-//            Uri personPhoto = acct.getPhotoUrl();
-
-            TextView user = findViewById(R.id.user_info);
-            user.setText(personName);
-
-        }
-        else {
-            SharedPreferences shared = getSharedPreferences(getString(R.string.preference_file_key_signup), MODE_PRIVATE);
-            String email = (shared.getString("emailAddress", ""));
-            String userId = (shared.getString("userId",""));
-            if(!email.equals("")){
-                TextView user  = findViewById(R.id.user_info);
-                user.setText(email);
-            }
-            else{
-            TextView user  = findViewById(R.id.user_info);
-            user.setText(R.string.guest);
-            }
-        }
+//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+//
+//        if (acct != null) {
+//            String personName = acct.getDisplayName();
+////            String personGivenName = acct.getGivenName();
+////            String personFamilyName = acct.getFamilyName();
+////            String personEmail = acct.getEmail();
+////            String personId = acct.getId();
+////            Uri personPhoto = acct.getPhotoUrl();
+//            TextView user = findViewById(R.id.user_info);
+//            user.setText(personName);
+//
+//        }
+//        else {
+//            if(!userId.equals("")){
+//                TextView user  = findViewById(R.id.user_info);
+//                user.setText(email);
+//            }
+//            else{
+//            TextView user  = findViewById(R.id.user_info);
+//            user.setText(R.string.guest);
+//            }
+//        }
 
         recyclerView = findViewById(R.id.recycler_view_landing);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(),2);
@@ -94,14 +123,10 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
 
         retrofit =  retrofitClass.getRetrofit();
         CategoryInterface categoryInterface = retrofit.create(CategoryInterface.class);
-        Call<List<Category>> call = categoryInterface.getAllCategories();
-        call.enqueue(new Callback<List<Category>>() {
+        Call<List<Category>> callGuest = categoryInterface.getAllCategories();
+        callGuest.enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
-                //Log.d("SignUpResponse :",response.body().toString());
-//                if(null == response){
-//                    Log.d("response :","null");
-//                }
                 categoryList = response.body();
                 mAdapter = new LandingAdapter(MainActivity.this,categoryList,MainActivity.this);
                 recyclerView.setAdapter(mAdapter);
@@ -112,6 +137,14 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
                 Log.d("getAllCategories"," : callback failure");
             }
         });
+
+        //Search View
+
+        SearchView searchView = findViewById(R.id.search_bar);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        ComponentName componentName = new ComponentName(MainActivity.this, SearchableActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
     }
 
     @Override
@@ -127,6 +160,19 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
     @Override
     protected void onStart() {
         super.onStart();
+
+//        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+//        userId = sharedPreferences.getString("userId","");
+//        String email = sharedPreferences.getString("email","");
+//        if(!email.equals("")){
+//            TextView user  = findViewById(R.id.user_info);
+//            user.setText(email);
+//        }
+//        else{
+//            TextView user  = findViewById(R.id.user_info);
+//            user.setText(R.string.guest);
+//        }
+
 
         //home button on click
         ImageButton home = findViewById(R.id.imageButton);
@@ -144,7 +190,9 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,1);
+                finish();
+                //startActivity(intent);
             }
         });
 
@@ -159,13 +207,30 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
         });
 
 
-        SharedPreferences sharedPreferences =getSharedPreferences(getString(R.string.preference_file_key_login), Context.MODE_PRIVATE);
-        String user = sharedPreferences.getString("name","");
+//        SharedPreferences sharedPreferences =getSharedPreferences(getString(R.string.preference_file_key_login), Context.MODE_PRIVATE);
+//        String user = sharedPreferences.getString("name","");
        // TextView textView = findViewById(R.id.login);
         //textView.setText(user);
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1){
+            if(resultCode == RESULT_OK){
+                sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                userId = (sharedPreferences.getString("userId",""));
+                String email = sharedPreferences.getString("email","Guest");
+                userInfo =  findViewById(R.id.user_info);
+                userInfo.setText(email);
+            }
+            if(resultCode == RESULT_CANCELED){
+                Toast.makeText(this, "nothing done on login page", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -206,22 +271,22 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
     @Override
     protected void onResume() {
         super.onResume();
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
-            String personName = acct.getDisplayName();
-//            String personGivenName = acct.getGivenName();
-//            String personFamilyName = acct.getFamilyName();
-//            String personEmail = acct.getEmail();
-//            String personId = acct.getId();
-//            Uri personPhoto = acct.getPhotoUrl();
-
-            TextView user = findViewById(R.id.user_info);
-            user.setText(personName);
-
-        }
-        else {
-            TextView user  = findViewById(R.id.user_info);
-            user.setText("Guest");
-        }
+//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+//        if (acct != null) {
+//            String personName = acct.getDisplayName();
+////            String personGivenName = acct.getGivenName();
+////            String personFamilyName = acct.getFamilyName();
+////            String personEmail = acct.getEmail();
+////            String personId = acct.getId();
+////            Uri personPhoto = acct.getPhotoUrl();
+//
+//            TextView user = findViewById(R.id.user_info);
+//            user.setText(personName);
+//
+//        }
+//        else {
+//            TextView user  = findViewById(R.id.user_info);
+//            user.setText("Guest");
+//        }
     }
 }

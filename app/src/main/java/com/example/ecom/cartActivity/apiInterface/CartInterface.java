@@ -16,10 +16,10 @@ import retrofit2.http.Path;
 
 public interface CartInterface {
 
-    @GET("/cartapi/cart/{userId}")
+    @GET("/cartandorder/cart/{userId}")
     Call<CartProductRevised> getFromCart(@Path("userId") @NonNull String userId);
 
     //@DELETE("cart/item")
-    @HTTP(method = "DELETE", path = "/cartapi/cart/reduceitem", hasBody = true)
+    @HTTP(method = "DELETE", path = "/cartandorder/cart/reduceitem", hasBody = true)
     Call<RemoveFromCart> removeFromCart(@Body RemoveFromCartRequest removeFromCartRequest);
 }

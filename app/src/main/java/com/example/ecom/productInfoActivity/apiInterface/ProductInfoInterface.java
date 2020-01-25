@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 
 public interface ProductInfoInterface {
 
-    @POST("/cartapi/cart/item")
+    @POST("/cartandorder/cart/item")
     Call<AddProductToCartResponse> addItemToCart(@Body AddProductToCartRequest addProductToCart);
 
 

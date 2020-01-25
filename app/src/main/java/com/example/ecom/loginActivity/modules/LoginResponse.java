@@ -6,21 +6,30 @@ import com.google.gson.annotations.SerializedName;
 //@Generated("com.robohorse.robopojogenerator")
 public class LoginResponse{
 
-	@SerializedName("data")
-	private String data;
+	@SerializedName("emailAddress")
+	private String emailAddress;
 
 	@SerializedName("message")
 	private String message;
 
+	@SerializedName("accessToken")
+	private String accessToken;
+
+	@SerializedName("userId")
+	private String userId;
+
+	@SerializedName("guestId")
+	private String guestId;
+
 	@SerializedName("statusCode")
 	private int statusCode;
 
-	public void setData(String data){
-		this.data = data;
+	public void setEmailAddress(String emailAddress){
+		this.emailAddress = emailAddress;
 	}
 
-	public String getData(){
-		return data;
+	public String getEmailAddress(){
+		return emailAddress;
 	}
 
 	public void setMessage(String message){
@@ -29,6 +38,30 @@ public class LoginResponse{
 
 	public String getMessage(){
 		return message;
+	}
+
+	public void setAccessToken(String accessToken){
+		this.accessToken = accessToken;
+	}
+
+	public String getAccessToken(){
+		return accessToken;
+	}
+
+	public void setUserId(String userId){
+		this.userId = userId;
+	}
+
+	public String getUserId(){
+		return userId;
+	}
+
+	public void setGuestId(String guestId){
+		this.guestId = guestId;
+	}
+
+	public String getGuestId(){
+		return guestId;
 	}
 
 	public void setStatusCode(int statusCode){
@@ -43,8 +76,11 @@ public class LoginResponse{
  	public String toString(){
 		return 
 			"LoginResponse{" + 
-			"data = '" + data + '\'' + 
+			"emailAddress = '" + emailAddress + '\'' + 
 			",message = '" + message + '\'' + 
+			",accessToken = '" + accessToken + '\'' + 
+			",userId = '" + userId + '\'' + 
+			",guestId = '" + guestId + '\'' + 
 			",statusCode = '" + statusCode + '\'' + 
 			"}";
 		}

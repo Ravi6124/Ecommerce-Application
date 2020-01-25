@@ -7,8 +7,20 @@ public class AccessTokenDTO {
     @SerializedName("accessToken")
     String accessToken;
 
-    public AccessTokenDTO(String accessToken) {
+    @SerializedName("role")
+    String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public AccessTokenDTO(String accessToken, String role) {
         this.accessToken = accessToken;
+        this.role = role;
     }
 
     public String getAccessToken() {

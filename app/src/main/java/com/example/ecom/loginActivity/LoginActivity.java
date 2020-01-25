@@ -10,18 +10,24 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.ecom.R;
-import com.example.ecom.RetrofitLogin;
+import com.example.ecom.RetrofitClass;
 import com.example.ecom.homeActivity.MainActivity;
 import com.example.ecom.loginActivity.apiInterface.LoginInterface;
 import com.example.ecom.loginActivity.modules.AccessTokenDTO;
 import com.example.ecom.loginActivity.modules.LoginResponse;
-import com.example.ecom.loginActivity.modules.signup.Data;
+import com.example.ecom.loginActivity.modules.login.LoginRequest;
 import com.example.ecom.loginActivity.modules.signup.SignUpRequest;
 import com.example.ecom.loginActivity.modules.signup.SignUpResponse;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,6 +36,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,6 +50,7 @@ import retrofit2.Retrofit;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private ImageButton imageButton;
     public GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInOptions gso;
     private int RC_SIGN_IN;
@@ -50,6 +59,9 @@ public class LoginActivity extends AppCompatActivity {
     private String userName;
     private String password;
     private int loginStatus;
+    CallbackManager callbackManager;
+    private String userId;
+    Retrofit retrofit;
 
     {
         RC_SIGN_IN = 1;
@@ -60,6 +72,77 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //home button on click
+        imageButton = findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+        //check for already logged user
+        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId","");
+        String email = sharedPreferences.getString("email","");
+        if(email=="")
+        {
+            Toast.makeText(context, "null email", Toast.LENGTH_SHORT).show();
+            updateUI(false);
+        }
+        else
+            {
+                updateUI(true);
+                Toast.makeText(context, "already logged in ", Toast.LENGTH_SHORT).show();
+                //loginStatus = true;
+            }
+
+
+        //facebook Login
+        callbackManager = CallbackManager.Factory.create();
+
+        final String EMAIL = "email";
+
+        LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
+        loginButton.setReadPermissions(Arrays.asList(EMAIL));
+        // If you are using in a fragment, call loginButton.setFragment(this);
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code loginResult has the access token
+                updateUI(true);
+                Toast.makeText(LoginActivity.this, "facebook logged in", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+                Toast.makeText(LoginActivity.this, "login cancelled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+                Toast.makeText(LoginActivity.this, "facebook exception", Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+
+        //facebook is logged in
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if(isLoggedIn){
+            updateUI(true);
+            Toast.makeText(this, "Already logged in via facebook", Toast.LENGTH_SHORT).show();
+        }
 
         //Custom Login
         findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
@@ -72,16 +155,51 @@ public class LoginActivity extends AppCompatActivity {
 
                 // todo send data to backend for authentication
 
+                LoginRequest loginRequest = new LoginRequest(userName,password,"customer");
+                RetrofitClass retrofitLogin = new RetrofitClass();
+                retrofit = retrofitLogin.getRetrofit();
+                LoginInterface loginInterface = retrofit.create(LoginInterface.class);
+                Call<LoginResponse> call = loginInterface.customLogin(loginRequest);
+                call.enqueue(new Callback<LoginResponse>() {
+                    @Override
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        //String user = response.body().getUserId();
+                        int status = response.body().getStatusCode();
+                        if(status == 1000){
+                            SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("userId",response.body().getUserId());
+                            editor.putString("email",response.body().getEmailAddress());
+                            editor.commit();
+                            Log.d("login","true");
+                            updateUI(true);
+
+                            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                            setResult(RESULT_OK,intent);
+                            //startActivity(intent);
+                            finish();
+                        }
+                        else {
+                            Toast.makeText(LoginActivity.this, "email already exists", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+
+                    }
+                });
+
                 //Using shared Preference to store login information of user
                 //context = getApplicationContext();
-                sharedPreferences = context.getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("userName",userName);
-                editor.putString("password",password);
-                //editor.commit will write to persistence data and apply will handle in the background
-                editor.apply();
+//                sharedPreferences = context.getSharedPreferences(
+//                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+//
+//                SharedPreferences.Editor editor = sharedPreferences.edit();
+//                editor.putString("userName",userName);
+//                editor.putString("password",password);
+//                //editor.commit will write to persistence data and apply will handle in the background
+//                editor.apply();
             }
         });
 
@@ -96,28 +214,29 @@ public class LoginActivity extends AppCompatActivity {
 
                 //send data to backend for registration
                 SignUpRequest request = new SignUpRequest(userName,password,"customer");
-                RetrofitLogin retrofitLogin = new RetrofitLogin();
-                Retrofit retrofit = retrofitLogin.getRetrofit();
+                RetrofitClass retrofitLogin = new RetrofitClass();
+                retrofit = retrofitLogin.getRetrofit();
                 LoginInterface loginInterface = retrofit.create(LoginInterface.class);
                 Call<SignUpResponse> call = loginInterface.register(request);
                 call.enqueue(new Callback<SignUpResponse>() {
                     @Override
                     public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
 
+                        //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
                         int status = response.body().getStatusCode();
                         if(status == 1000){
                             updateUI(true);
-                        Data data = response.body().getData();
-                        sharedPreferences = context.getSharedPreferences(
-                                    getString(R.string.preference_file_key_signup), Context.MODE_PRIVATE);
-
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("emailAddress",data.getEmailAddress());
-                            editor.putString("userId",String.valueOf(data.getUserId()));
-                            //editor.commit will write to persistence data and apply will handle in the background
-                            editor.apply();
+                        //Data data = response.body().getData();
+//                        sharedPreferences = context.getSharedPreferences(
+//                                    getString(R.string.preference_file_key_signup), Context.MODE_PRIVATE);
+//
+//                            SharedPreferences.Editor editor = sharedPreferences.edit();
+//                            editor.putString("emailAddress",data.getEmailAddress());
+//                            editor.putString("userId",String.valueOf(data.getUserId()));
+//                            //editor.commit will write to persistence data and apply will handle in the background
+//                            editor.apply();
                             //String message = response.body().getMessage();
-                            Toast.makeText(LoginActivity.this, "Registration Success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Registration Success : You can login now", Toast.LENGTH_SHORT).show();
                         }
                         else{
                             Toast.makeText(LoginActivity.this, "Registration Failed : Try other methods", Toast.LENGTH_SHORT).show();
@@ -151,45 +270,57 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.sign_out_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(null != account){
-            updateUI(true);
-            Toast.makeText(context, "Already singed in", Toast.LENGTH_LONG).show();
-//        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-//        startActivity(intent);
-        }
-        else {
-            updateUI(false);
-        }
+//        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+//        String email = sharedPreferences.getString("email","");
+//        if(email==""){
+//            updateUI(false);
+//        }
 
-        findViewById(R.id.sign_out_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateUI(false);
-                signOut();
-//                SharedPreferences sharedPreferences = context.getSharedPreferences("sign_out",Context.MODE_PRIVATE);
-//                SharedPreferences.Editor editor = sharedPreferences.edit();
-//                editor.putString("name","Guest");
+//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+//        if(null != account){
+//            updateUI(true);
+//            Toast.makeText(context, "Already singed in", Toast.LENGTH_LONG).show();
+////        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+////        startActivity(intent);
+//        }
+//        else {
+//            updateUI(false);
+//        }
+//
+//        findViewById(R.id.sign_out_button).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                updateUI(false);
+//                signOut();
+////                SharedPreferences sharedPreferences = context.getSharedPreferences("sign_out",Context.MODE_PRIVATE);
+////                SharedPreferences.Editor editor = sharedPreferences.edit();
+////                editor.putString("name","Guest");
+////                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+////                startActivity(intent);
+//                //finish();
+//            }
+//        });
+//
+//        findViewById(R.id.imageButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
 //                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
 //                startActivity(intent);
-                //finish();
-            }
-        });
-
-        findViewById(R.id.imageButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
+//            }
+//        });
 
     }
 
@@ -206,6 +337,14 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(context, "Signed Out", Toast.LENGTH_SHORT).show();
                     }
                 });
+        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+        updateUI(false);
+        //setResult(RESULT_OK,);
+
+       // LoginManager.getInstance().logOut();
     }
 
 
@@ -220,15 +359,23 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
+
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String userName = account.getDisplayName();
+            sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+            final SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("email",userName);
+            //editor.commit();
             // TODO: 2020-01-22 send the token to backend
             String token = account.getIdToken();
-            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken());
-            RetrofitLogin retrofitLogin = new RetrofitLogin();
+            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken(),"customer");
+            RetrofitClass retrofitLogin = new RetrofitClass();
             Retrofit retrofit = retrofitLogin.getRetrofit();
             LoginInterface loginInterface = retrofit.create(LoginInterface.class);
             Call<LoginResponse> call = loginInterface.googleLogIn(accessTokenDTO);
@@ -237,6 +384,11 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                     loginStatus = response.body().getStatusCode();
+                    String userId = response.body().getUserId();
+                    editor.putString("userId",userId);
+                    // TODO: 2020-01-25  do commit here and update UI here only
+                    //editor.commit();
+                   // setResult(RESULT_OK,);
                 }
 
                 @Override
@@ -244,8 +396,9 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d("Authorization","not responding");
                 }
             });
-
+            editor.commit();
             // Signed in successfully, show authenticated UI.
+            updateUI(true);
             Log.d("loginStatus",String.valueOf(loginStatus));
             Log.d("token",token);
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -255,8 +408,10 @@ public class LoginActivity extends AppCompatActivity {
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
 //            editor.putString("name",account.getDisplayName());
             //editor.commit will write to persistence data and apply will handle in the background
-//            editor.apply();
-            startActivity(intent);
+//            editor.apply();                   s
+            setResult(RESULT_OK,intent);
+
+            //startActivity(intent);
             finish();
 
         } catch (ApiException e) {
@@ -277,6 +432,7 @@ public class LoginActivity extends AppCompatActivity {
             findViewById(R.id.textView2).setVisibility(View.GONE);
             findViewById(R.id.email).setVisibility(View.GONE);
             findViewById(R.id.password).setVisibility(View.GONE);
+            findViewById(R.id.facebook_login_button).setVisibility(View.GONE);
             //findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
@@ -288,6 +444,7 @@ public class LoginActivity extends AppCompatActivity {
             findViewById(R.id.textView2).setVisibility(View.VISIBLE);
             findViewById(R.id.email).setVisibility(View.VISIBLE);
             findViewById(R.id.password).setVisibility(View.VISIBLE);
+            findViewById(R.id.facebook_login_button).setVisibility(View.VISIBLE);
 
             //findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }

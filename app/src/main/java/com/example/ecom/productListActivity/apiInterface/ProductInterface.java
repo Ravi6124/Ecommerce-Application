@@ -12,6 +12,6 @@ import retrofit2.http.Path;
 
 public interface ProductInterface {
 
-    @GET("productapi/product/category/{id}/{page}/{size}")
+    @GET("product/product/category/{id}/{page}/{size}")
     Call<ProductPage> getProductsByCategoryId(@Path("id") String cId, @Path("page")int page, @Path("size")int size);
 }
