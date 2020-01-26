@@ -66,7 +66,9 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
 
     @Override
     public void onClick(MerchantResponse merchantResponse) {
-        Intent intent = new Intent(MerchantActivity.this, ProductInfoActivity.class);
+
+
+        Intent intent = new Intent(getApplicationContext(), ProductInfoActivity.class);
 
         SharedPreferences sharedPref = getSharedPreferences("merchant_product_info", MODE_PRIVATE);
         SharedPreferences.Editor editorMerchant = sharedPref.edit();
@@ -77,7 +79,10 @@ public class MerchantActivity extends AppCompatActivity implements MerchantAdapt
         editorMerchant.putFloat("cost",(float)merchantResponse.getCost());
         editorMerchant.putString("rating",String.valueOf(merchantResponse.getProductRating()));
         editorMerchant.putString("merchantId",merchantResponse.getMerchantId());
+        editorMerchant.putString("theme",merchantResponse.getTheme());
         editorMerchant.commit();
-        startActivity(intent);
+        setResult(RESULT_OK,intent);
+        //startActivity(intent);
+        finish();
     }
 }

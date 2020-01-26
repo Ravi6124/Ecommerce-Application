@@ -1,9 +1,11 @@
 package com.example.ecom.cartActivity;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +25,7 @@ import com.example.ecom.cartActivity.apiInterface.CartInterface;
 import com.example.ecom.cartActivity.apiInterface.CheckoutInterface;
 import com.example.ecom.cartActivity.models.CartProductRevised;
 import com.example.ecom.cartActivity.models.checkout.CheckoutResponse;
+import com.example.ecom.checkoutActivity.CheckoutActivity;
 import com.example.ecom.homeActivity.MainActivity;
 import com.example.ecom.loginActivity.LoginActivity;
 
@@ -42,6 +45,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
     private RecyclerView.Adapter mAdapter;
     private RetrofitClass retrofitClass = new RetrofitClass();
     private Button checkoutBtn ;
+    private Button buyNowBtn;
     private Context context;
     private String userId;
 
@@ -78,42 +82,60 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                 Toast.makeText(getApplicationContext(),"cart api callback failure",Toast.LENGTH_LONG).show();
             }
         });
+
         checkoutBtn =findViewById(R.id.checkout);
 
         checkoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                final ProgressDialog progressDialog;
+            progressDialog = new ProgressDialog(CartActivity.this);
+            progressDialog.setMax(100);
+            progressDialog.setMessage("Its loading....");
+            progressDialog.setTitle("ProgressDialog bar example");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.show();
+
                 SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
-                String userId = sharedPreferences.getString("userId","");
-                if(userId.equals("")){
-                    Intent intent = new Intent(CartActivity.this, LoginActivity.class);
-                    //startActivityForResult
-                    startActivity(intent);
+                String userId = sharedPreferences.getString("email","");
+                if(!userId.equals("")){
+
+                    CheckoutInterface checkoutInterface = retrofit.create(CheckoutInterface.class);
+                    Call<CheckoutResponse> callCheckout = checkoutInterface.checkout(cartProductRevised);
+                    callCheckout.enqueue(new Callback<CheckoutResponse>() {
+                        @Override
+                        public void onResponse(Call<CheckoutResponse> call, Response<CheckoutResponse> response) {
+                            String orderId = response.body().getOrderId();
+                            Toast.makeText(CartActivity.this, orderId, Toast.LENGTH_SHORT).show();
+                            Intent intent = new  Intent(CartActivity.this, CheckoutActivity.class);
+                            intent.putExtra("orderId",orderId);
+                            progressDialog.dismiss();
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(Call<CheckoutResponse> call, Throwable t) {
+                            progressDialog.dismiss();
+                            Toast.makeText(CartActivity.this, "order response failure: cannot checkout", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else{
+                    progressDialog.dismiss();
+                    Toast.makeText(CartActivity.this, "cannot checkout", Toast.LENGTH_LONG).show();
+//                    new AlertDialog.Builder(context)
+//                            .setTitle("Checkout")
+//                            .setMessage("You need to be logged in first to make checkout !")
+//                            .setNegativeButton(android.R.string.no, null)
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+
+                    //Toast.makeText(CartActivity.this, "you need to be logged in first!!", Toast.LENGTH_SHORT).show();
                 }
 
-                CheckoutInterface checkoutInterface = retrofit.create(CheckoutInterface.class);
-                Call<CheckoutResponse> callCheckout = checkoutInterface.checkout(cartProductRevised);
-                callCheckout.enqueue(new Callback<CheckoutResponse>() {
-                    @Override
-                    public void onResponse(Call<CheckoutResponse> call, Response<CheckoutResponse> response) {
-                        String orderId = response.body().getOrderId();
-                        Toast.makeText(CartActivity.this, orderId, Toast.LENGTH_SHORT).show();
-                        //finish();
-                        //startActivity(new Intent(context, CartActivity.class));
-                        //Intent intent = getIntent();
-                        Intent intent = new  Intent(CartActivity.this,MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                        //startActivity(intent);
 
-                    }
-
-                    @Override
-                    public void onFailure(Call<CheckoutResponse> call, Throwable t) {
-
-                    }
-                });
 //                CartInterface cartInterface = retrofit.create(CartInterface.class);
 //                Call<CartProductRevised> call = cartInterface.getFromCart( "fakeId");
 //
@@ -137,6 +159,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
 
 
 
+
+
     }
 
     @Override
@@ -149,6 +173,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
             public void onClick(View v) {
                 Intent intent = new Intent(CartActivity.this, CartActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -158,6 +183,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
             public void onClick(View v) {
                 Intent intent = new Intent(CartActivity.this,MainActivity.class);
                 startActivity(intent);
+                //finish();
             }
         });
 

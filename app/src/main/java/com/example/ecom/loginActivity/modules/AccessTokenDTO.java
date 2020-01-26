@@ -13,6 +13,17 @@ public class AccessTokenDTO {
     @SerializedName("guestId")
     String guestId;
 
+    @SerializedName("loginSource")
+    String loginSource;
+
+    @SerializedName("type")
+    String type;
+
+    {
+        type = "android";
+        loginSource = "google";
+    }
+
     public String getRole() {
         return role;
     }

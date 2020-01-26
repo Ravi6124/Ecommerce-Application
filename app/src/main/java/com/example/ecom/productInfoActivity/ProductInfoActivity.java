@@ -1,6 +1,7 @@
 package com.example.ecom.productInfoActivity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.SearchManager;
@@ -65,8 +66,8 @@ public class ProductInfoActivity extends AppCompatActivity {
         TextView tvProductName = findViewById(R.id.productName);
         ImageView ivProductImage = findViewById(R.id.productImage);
         TextView tvProductDescription = findViewById(R.id.productDescription);
-        TextView tvDefaultProductPrice = findViewById(R.id.price_default);
-        TextView defaultMerchantName = findViewById(R.id.merchant_name);
+        TextView tvDefaultProductPrice = findViewById(R.id.price_default_value);
+        TextView defaultMerchantName = findViewById(R.id.merchant_name_text);
         Button btnAddToCart = findViewById(R.id.addToCartButton);
         Button btnBuyNow = findViewById(R.id.buyNowButton);
         Button moreMerchants = findViewById(R.id.merchantList);
@@ -81,6 +82,7 @@ public class ProductInfoActivity extends AppCompatActivity {
         final String imageURL;
         final float defaultPrice;
         final String categoryId;
+        final double defPrice;
 
         shared = getSharedPreferences("productInfo", MODE_PRIVATE);
 
@@ -92,16 +94,49 @@ public class ProductInfoActivity extends AppCompatActivity {
             merchantName = shared.getString("defaultMerchantName","");
             description = shared.getString("description","");
             imageURL  = shared.getString("imageURL","");
-            defaultPrice = shared.getFloat("defaultPrice",0);
+            defPrice = shared.getFloat("defaultPrice",0);
             categoryId = shared.getString("categoryId","");
 
+//            Bundle shared1 = getIntent().getExtras();
+//            name = shared1.getString("name","");
+//             productId = shared1.getString("productId","");
+//             defaultMerchantId = shared1.getString("defaultMerchantId","");
+//             merchantName = shared1.getString("defaultMerchantName","");
+//             description = shared1.getString("description","");
+//            imageURL  = shared1.getString("imageURL","");
+//            defPrice = shared1.getDouble("defaultPrice");
+//            categoryId = shared1.getString("categoryId","");
             //Setting the page components from the values recieved from the bundle
+
             tvProductName.setText(name);
             Glide.with(this).load(imageURL).into(ivProductImage);
             tvProductDescription.setText(description);
-            defaultMerchantName.setText(merchantName);
+//            defaultMerchantName.setText(merchantName);
+            tvDefaultProductPrice.setText("Rs." +defPrice);
 
-            tvDefaultProductPrice.setText(String.valueOf(defaultPrice));
+            SharedPreferences defaultPref = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+            String nameDefault = defaultPref.getString("defaultMerchantName","");
+            String ratingDefault = defaultPref.getString("defaultRating","");
+            String colorDefault = defaultPref.getString("defaultColor","");
+            String themeDefault = defaultPref.getString("defaultTheme","");
+            String sizeDefault = defaultPref.getString("defaultSize","");
+
+            defaultMerchantName.setText(nameDefault);
+
+            TextView rating = findViewById(R.id.productRating);
+            rating.setText(ratingDefault);
+
+            TextView color = findViewById(R.id.color);
+            color.setText(colorDefault);
+
+            TextView theme = findViewById(R.id.theme);
+            theme.setText(themeDefault);
+
+            TextView size = findViewById(R.id.size);
+            size.setText(sizeDefault);
+
+
+
 //        }
 
 //        else{
@@ -154,7 +189,39 @@ public class ProductInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                shared = getSharedPreferences("productInfo", MODE_PRIVATE);
+                String merchantId = shared.getString("defaultMerchantId","");
+                float price = (shared.getFloat("defaultPrice",0));
 
+                SharedPreferences sharedPref = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                userId = sharedPref.getString("userId","");
+                Log.d("userId",userId);
+                CartProduct cartProduct = new CartProduct(1,imageURL,productId,merchantId,price,name);
+                AddProductToCartRequest addProductToCart = new AddProductToCartRequest(userId,cartProduct);
+
+                // TODO: 2020-01-22 for now different retrofit class for differnet services
+//                RetrofitClass retrofitClass = new RetrofitClass();
+//                Retrofit retrofit = retrofitClass.getRetrofit();
+                RetrofitClass retrofitCart = new RetrofitClass();
+                Retrofit retrofit = retrofitCart.getRetrofit();
+                ProductInfoInterface productInfoInterface = retrofit.create(ProductInfoInterface.class);
+
+                Call<AddProductToCartResponse> call = productInfoInterface.addItemToCart(addProductToCart);
+                call.enqueue(new Callback<AddProductToCartResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<AddProductToCartResponse> call, @NonNull Response<AddProductToCartResponse> response) {
+                        Log.d("SignUpResponse","item added to cart");
+                        addProductToCartResponse = new AddProductToCartResponse(response.body().getResultCode(),response.body().getCart());
+                        Intent intent = new Intent(ProductInfoActivity.this,CartActivity.class);
+                        startActivity(intent);
+                        //Toast.makeText(ProductInfoActivity.this, "item added to cart", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<AddProductToCartResponse> call, Throwable t) {
+                        Log.d("SignUpResponse","item could not be added");
+                    }
+                });
             }
         });
 
@@ -163,12 +230,56 @@ public class ProductInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ProductInfoActivity.this, MerchantActivity.class);
                 intent.putExtra("productId",productId);
-                startActivity(intent);
+                startActivityForResult(intent,2);
+
             }
         });
 
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode ==2){
+            if(resultCode==RESULT_OK){
+                SharedPreferences sharedPreferences = getSharedPreferences("merchant_product_info",MODE_PRIVATE);
+                if(null != sharedPreferences) {
+                    String color = sharedPreferences.getString("color","color");
+                    String theme = sharedPreferences.getString("theme","");
+                    String size = sharedPreferences.getString("size","");
+                    String rating = sharedPreferences.getString("rating","");
+                    String merchantName = sharedPreferences.getString("merchantName","");
+                    String merchantId = sharedPreferences.getString("merchantId","");
+                    Float cost  = sharedPreferences.getFloat("cost",0);
+
+                    TextView colorVal = findViewById(R.id.color);
+                    TextView themeVal = findViewById(R.id.theme);
+                    TextView sizeVal = findViewById(R.id.size);
+                    TextView ratingVal = findViewById(R.id.productRating);
+                    TextView merchantVal = findViewById(R.id.merchant_name_text);
+                    TextView costVal = findViewById(R.id.price_default_value);
+
+                    // update merchant Id in the product info
+                    SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = shared.edit();
+                    editor.putString("defaultMerchantId",merchantId);
+                    editor.putFloat("defaultPrice",cost);
+                    editor.commit();
+
+                    ratingVal.setText(rating);
+                    colorVal.setText(color);
+                    themeVal.setText(theme);
+                    sizeVal.setText(size);
+                    merchantVal.setText(merchantName);
+                    costVal.setText(String.valueOf(cost));
+                }
+
+            }
+            if(resultCode == RESULT_CANCELED){
+                Toast.makeText(this, "merchant not set", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -191,39 +302,6 @@ public class ProductInfoActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        SharedPreferences sharedPreferences = getSharedPreferences("merchant_product_info",MODE_PRIVATE);
-        if(null != sharedPreferences) {
-            String color = sharedPreferences.getString("color","");
-            String theme = sharedPreferences.getString("theme","");
-            String size = sharedPreferences.getString("size","");
-            String rating = sharedPreferences.getString("rating","");
-            String merchantName = sharedPreferences.getString("merchantName","");
-            String merchantId = sharedPreferences.getString("merchantId","");
-            Float cost  = sharedPreferences.getFloat("cost",0);
-
-            TextView colorVal = findViewById(R.id.color);
-            TextView themeVal = findViewById(R.id.theme);
-            TextView sizeVal = findViewById(R.id.size);
-            TextView ratingVal = findViewById(R.id.productRating);
-            TextView merchantVal = findViewById(R.id.merchant_name_text);
-            TextView costVal = findViewById(R.id.price_default);
-
-            // update merchant Id in the product info
-            SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
-            SharedPreferences.Editor editor = shared.edit();
-            editor.putString("defaultMerchantId",merchantId);
-            editor.putFloat("defaultPrice",cost);
-            editor.commit();
-
-            ratingVal.setText(rating);
-            colorVal.setText(color);
-            themeVal.setText(theme);
-            sizeVal.setText(size);
-            merchantVal.setText(merchantName);
-            costVal.setText(String.valueOf(cost));
-        }
-
 
     }
 

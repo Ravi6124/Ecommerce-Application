@@ -25,6 +25,8 @@ import com.example.ecom.productInfoActivity.ProductInfoActivity;
 import com.example.ecom.productListActivity.adaptor.ProductsAdapter;
 import com.example.ecom.productListActivity.apiInterface.ProductInterface;
 import com.example.ecom.productListActivity.models.ContentItem;
+import com.example.ecom.productListActivity.models.DefaultProductResponse;
+import com.example.ecom.productListActivity.models.MerchantResponse;
 import com.example.ecom.productListActivity.models.ProductPage;
 import com.example.ecom.searchableActivity.SearchableActivity;
 
@@ -138,24 +140,118 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
     }
 
     @Override
-    public void onClick(ContentItem product) {
-        Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
+    public void onClick(final ContentItem product) {
         //create bundle
         SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
-        SharedPreferences.Editor editor = shared.edit();
+        final SharedPreferences.Editor editor = shared.edit();
         editor.putString("name",product.getProductName());
         editor.putString("description",product.getDescription());
         editor.putString("defaultMerchantId",product.getDefaultMerchantId());
-        Float price = (float)product.getDefaultPrice();
-        editor.putFloat("defaultPrice",price);
-//        bundle.putDouble("average",product.getAverageProductRating());
-//        bundle.putInt("numberOfRatings",product.getNumberOfRatings());
-        editor.putString("imageURL",product.getImageURL());
-        editor.putString("categoryId",product.getCategoryId());
-        editor.putString("productId",product.getProductId());
-        editor.putInt("totalStock",product.getTotalStock());
-        editor.apply();
-        startActivity(intent);
+        editor.commit();
+        //editor.putString("defaultMerchantName",product.g)
+
+        final RetrofitClass retrofitClass = new RetrofitClass();
+        Retrofit retrofit = retrofitClass.getRetrofit();
+        ProductInterface productInterface = retrofit.create(ProductInterface.class);
+        Call<MerchantResponse> callMerchant = productInterface.getMerchantById(product.getDefaultMerchantId());
+        callMerchant.enqueue(new Callback<MerchantResponse>() {
+            @Override
+            public void onResponse(Call<MerchantResponse> call, Response<MerchantResponse> response) {
+                SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
+                SharedPreferences.Editor editor1 = shared.edit();
+
+                Float price = (float)product.getDefaultPrice();
+                editor1.putFloat("defaultPrice",price);
+                editor1.putString("imageURL",product.getImageURL());
+                editor1.putString("categoryId",product.getCategoryId());
+                editor1.putString("productId",product.getProductId());
+                editor1.putInt("totalStock",product.getTotalStock());
+                //product.get
+//                editor1.putString("defaultMerchantName",response.body().getFirstName());
+                //response.body().
+                editor1.commit();
+//                Bundle bundle = new Bundle();
+//                bundle.putString("name",product.getProductName());
+//                bundle.putString("description",product.getDescription());
+//                //bundle.putString("rating",product.get);
+//                bundle.putDouble("defaultPrice",product.getDefaultPrice());
+//                bundle.putString("imageURL",product.getImageURL());
+//                bundle.putString("categoryId",product.getCategoryId());
+//                bundle.putString("productId",product.getProductId());
+//                bundle.putInt("totalStock",product.getTotalStock());
+//                bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
+
+                Retrofit retrofit1 = retrofitClass.getRetrofit();
+                ProductInterface productInterfaceDefault = retrofit1.create(ProductInterface.class);
+                Call<DefaultProductResponse> callDefault = productInterfaceDefault.getDefaultMerchantData(product.getDefaultMerchantId(),product.getProductId());
+                callDefault.enqueue(new Callback<DefaultProductResponse>() {
+                    @Override
+                    public void onResponse(Call<DefaultProductResponse> call, Response<DefaultProductResponse> response) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = sharedPreferences.edit();
+                        editor1.putString("defaultMerchantName",response.body().getMerchantName());
+                        editor1.putString("defaultRating",String.valueOf(response.body().getProductListingRating()));
+                        editor1.putString("defaultColor",response.body().getColor());
+                        editor1.putString("defaultTheme",response.body().getTheme());
+                        editor1.putString("defaultSize",response.body().getSize());
+                        editor1.commit();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("name",product.getProductName());
+                        bundle.putString("description",product.getDescription());
+                        //bundle.putString("rating",product.get);
+                        bundle.putDouble("defaultPrice",product.getDefaultPrice());
+                        bundle.putString("imageURL",product.getImageURL());
+                        bundle.putString("categoryId",product.getCategoryId());
+                        bundle.putString("productId",product.getProductId());
+                        bundle.putInt("totalStock",product.getTotalStock());
+                        bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
+
+                        Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
+
+                    }
+                });
+
+//                Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
+
+            }
+
+            @Override
+            public void onFailure(Call<MerchantResponse> call, Throwable t) {
+
+            }
+        });
+
+//        ProductInterface productInterfaceDefault = retrofit.create(ProductInterface.class);
+//        Call<DefaultProductResponse> call = productInterfaceDefault.getDefaultMerchantData(product.getDefaultMerchantId(),product.getProductId());
+//        call.enqueue(new Callback<DefaultProductResponse>() {
+//            @Override
+//            public void onResponse(Call<DefaultProductResponse> call, Response<DefaultProductResponse> response) {
+//                SharedPreferences sharedPreferences = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+//                SharedPreferences.Editor editor1 = sharedPreferences.edit();
+//                editor1.putString("defaultMerchantName",response.body().getMerchantName());
+//                editor1.putString("defaultRating",String.valueOf(response.body().getProductListingRating()));
+//                editor1.putString("defaultColor",response.body().getColor());
+//                editor1.putString("defaultTheme",response.body().getTheme());
+//                editor1.putString("defaultSize",response.body().getSize());
+//                editor1.commit();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
+//
+//            }
+//        });
         //intent.putExtra("cId",product.getImageURL());
 
 

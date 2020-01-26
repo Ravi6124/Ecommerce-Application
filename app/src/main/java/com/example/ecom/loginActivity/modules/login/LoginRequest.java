@@ -5,6 +5,13 @@ public class LoginRequest{
 	private String password;
 	private String role;
 	private String guestId;
+	private String type;
+	private String loginSource;
+
+	{
+		type = "android";
+		loginSource = "local";
+	}
 
 	public LoginRequest(String emailAddress, String password, String role, String guestId) {
 		this.emailAddress = emailAddress;

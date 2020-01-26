@@ -4,6 +4,7 @@ package com.example.ecom.homeActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+//        setSupportActionBar(myToolbar);
 
         sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
         RetrofitClass retrofitLogin = new RetrofitClass();
@@ -264,11 +268,15 @@ public class MainActivity extends AppCompatActivity implements LandingAdapter.Ca
                 String email = sharedPreferences.getString("email","Guest");
                 userInfo =  findViewById(R.id.user_info);
                 userInfo.setText(email);
+
             }
             if(resultCode == RESULT_CANCELED){
                 Toast.makeText(this, "nothing done on login page", Toast.LENGTH_SHORT).show();
             }
         }
+
+//        Intent intent = new Intent(MainActivity.this,MainActivity.class);
+//        startActivity(intent);
     }
 
     @Override

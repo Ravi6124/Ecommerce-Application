@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ecommerce Application</string>
+    <string name="app_name">League of Avengers</string>
     <string name="home">HomeButton</string>
     <string name="cart">CartButton</string>
     <string name="checkout">CHECKOUT</string>
@@ -36,5 +36,6 @@
 
     <string name="facebook_app_id">127131675132171</string>
     <string name="fb_login_protocol_scheme">fb127131675132171</string>
+    <string name="continueShopping">Continue Shopping!</string>
 
 </resources>

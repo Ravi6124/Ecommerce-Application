@@ -3,6 +3,7 @@ package com.example.ecom.loginActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -81,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -117,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code loginResult has the access token
+                String accessToken = loginResult.getAccessToken().getToken();
                 updateUI(true);
                 Toast.makeText(LoginActivity.this, "facebook logged in", Toast.LENGTH_SHORT).show();
             }
@@ -175,9 +178,9 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("login","true");
                             updateUI(true);
 
-                            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                             setResult(RESULT_OK,intent);
-                            //startActivity(intent);
+                            startActivity(intent);
                             finish();
                         }
                         else {
@@ -190,17 +193,6 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                 });
-
-                //Using shared Preference to store login information of user
-                //context = getApplicationContext();
-//                sharedPreferences = context.getSharedPreferences(
-//                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-//
-//                SharedPreferences.Editor editor = sharedPreferences.edit();
-//                editor.putString("userName",userName);
-//                editor.putString("password",password);
-//                //editor.commit will write to persistence data and apply will handle in the background
-//                editor.apply();
             }
         });
 
@@ -226,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                         //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
                         int status = response.body().getStatusCode();
                         if(status == 1000){
-                            updateUI(true);
+                           // updateUI(true);
                         //Data data = response.body().getData();
 //                        sharedPreferences = context.getSharedPreferences(
 //                                    getString(R.string.preference_file_key_signup), Context.MODE_PRIVATE);
@@ -281,49 +273,6 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
-//        String email = sharedPreferences.getString("email","");
-//        if(email==""){
-//            updateUI(false);
-//        }
-
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-//        if(null != account){
-//            updateUI(true);
-//            Toast.makeText(context, "Already singed in", Toast.LENGTH_LONG).show();
-////        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-////        startActivity(intent);
-//        }
-//        else {
-//            updateUI(false);
-//        }
-//
-//        findViewById(R.id.sign_out_button).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                updateUI(false);
-//                signOut();
-////                SharedPreferences sharedPreferences = context.getSharedPreferences("sign_out",Context.MODE_PRIVATE);
-////                SharedPreferences.Editor editor = sharedPreferences.edit();
-////                editor.putString("name","Guest");
-////                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-////                startActivity(intent);
-//                //finish();
-//            }
-//        });
-//
-//        findViewById(R.id.imageButton).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-
-    }
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -391,19 +340,19 @@ public class LoginActivity extends AppCompatActivity {
             Call<LoginResponse> call = loginInterface.googleLogIn(accessTokenDTO);
 
             //progress Dialog
-            final ProgressDialog progressDoalog;
-            progressDoalog = new ProgressDialog(LoginActivity.this);
-            progressDoalog.setMax(100);
-            progressDoalog.setMessage("Its loading....");
-            progressDoalog.setTitle("ProgressDialog bar example");
-            progressDoalog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//            final ProgressDialog progressDialog;
+//            progressDialog = new ProgressDialog(LoginActivity.this);
+//            progressDialog.setMax(100);
+//            progressDialog.setMessage("Its loading....");
+//            progressDialog.setTitle("ProgressDialog bar example");
+//            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             // show it
-            progressDoalog.show();
+            //progressDialog.show();
 
             call.enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                    progressDoalog.dismiss();
+                   // progressDoalog.dismiss();
 
                     loginStatus = response.body().getStatusCode();
                     String userId = response.body().getUserId();
@@ -411,12 +360,16 @@ public class LoginActivity extends AppCompatActivity {
                     // TODO: 2020-01-25  do commit here and update UI here only
                     editor.commit();
                     updateUI(true);
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    setResult(RESULT_OK,intent);
+                    startActivity(intent);
+                    finish();
                    // setResult(RESULT_OK,);
                 }
 
                 @Override
                 public void onFailure(Call<LoginResponse> call, Throwable t) {
-                    progressDoalog.dismiss();
+                  //  progressDoalog.dismiss();
                     Log.d("Authorization","not responding");
                 }
             });
@@ -425,7 +378,7 @@ public class LoginActivity extends AppCompatActivity {
             //updateUI(true);
             Log.d("loginStatus",String.valueOf(loginStatus));
             Log.d("token",token);
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
 //            sharedPreferences = context.getSharedPreferences(
 //                    getString(R.string.preference_file_key_login), Context.MODE_PRIVATE);
 //
@@ -433,9 +386,16 @@ public class LoginActivity extends AppCompatActivity {
 //            editor.putString("name",account.getDisplayName());
             //editor.commit will write to persistence data and apply will handle in the background
 //            editor.apply();                   s
-            setResult(RESULT_OK,intent);
-            startActivity(intent);
-            finish();
+
+
+//            ((Activity)context).finish();
+//            context.startActivity(new Intent(context, MainActivity.class));
+
+//            Intent refresh = new Intent(this, MainActivity.class); //inboxlist is activity which list the read and unread messages
+//            startActivity(refresh);
+//            this.finish();
+
+
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
