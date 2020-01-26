@@ -124,7 +124,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                 }
                 else{
                     progressDialog.dismiss();
-                    Toast.makeText(CartActivity.this, "cannot checkout", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CartActivity.this, "Please Login : cannot checkout without loggin in", Toast.LENGTH_LONG).show();
 //                    new AlertDialog.Builder(context)
 //                            .setTitle("Checkout")
 //                            .setMessage("You need to be logged in first to make checkout !")
