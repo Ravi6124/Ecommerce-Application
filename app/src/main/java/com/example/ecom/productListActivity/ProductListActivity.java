@@ -80,7 +80,7 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
                 super.onScrolled(recyclerView, dx, dy);
                 position =  gridLayoutManager.findLastCompletelyVisibleItemPosition();
 
-                if ((position == productList.size()-1)&&(page!=totalPages-1)){
+                if ((position == productList.size()-1)&&(page!=totalPages)){
                     // End has been reached
                     page++;
                     apiCall(page,size);
@@ -90,27 +90,6 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
         });
 
         apiCall(page,size);
-
-//        retrofit =  retrofitClass.getRetrofit();
-//        ProductInterface productInterface = retrofit.create(ProductInterface.class);
-//        Call<ProductPage> call = productInterface.getProductsByCategoryId(categoryId,page,size);
-//        call.enqueue(new Callback<ProductPage>() {
-//            @Override
-//            public void onResponse(Call<ProductPage> call, SignUpResponse<ProductPage> response) {
-//                productList = response.body().getContent();
-//                totalPages =  response.body().getTotalPages();
-//                totalElements = response.body().getTotalElements();
-//                page++;
-//                Toast.makeText(ProductListActivity.this, "size : " + productList.size(), Toast.LENGTH_SHORT).show();
-//                mAdapter = new ProductsAdapter(ProductListActivity.this,productList,ProductListActivity.this);
-//                recyclerView.setAdapter(mAdapter);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ProductPage> call, Throwable t) {
-//                Log.d("error: ","callback failed");
-//            }
-//        });
 
     }
 
@@ -166,22 +145,10 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
                 editor1.putString("categoryId",product.getCategoryId());
                 editor1.putString("productId",product.getProductId());
                 editor1.putInt("totalStock",product.getTotalStock());
-                //product.get
-//                editor1.putString("defaultMerchantName",response.body().getFirstName());
-                //response.body().
                 editor1.commit();
-//                Bundle bundle = new Bundle();
-//                bundle.putString("name",product.getProductName());
-//                bundle.putString("description",product.getDescription());
-//                //bundle.putString("rating",product.get);
-//                bundle.putDouble("defaultPrice",product.getDefaultPrice());
-//                bundle.putString("imageURL",product.getImageURL());
-//                bundle.putString("categoryId",product.getCategoryId());
-//                bundle.putString("productId",product.getProductId());
-//                bundle.putInt("totalStock",product.getTotalStock());
-//                bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
 
-                Retrofit retrofit1 = retrofitClass.getRetrofit();
+                RetrofitClass retrofitClass1 = new RetrofitClass();
+                Retrofit retrofit1 = retrofitClass1.getRetrofit();
                 ProductInterface productInterfaceDefault = retrofit1.create(ProductInterface.class);
                 Call<DefaultProductResponse> callDefault = productInterfaceDefault.getDefaultMerchantData(product.getDefaultMerchantId(),product.getProductId());
                 callDefault.enqueue(new Callback<DefaultProductResponse>() {
@@ -196,64 +163,37 @@ public class ProductListActivity extends AppCompatActivity implements ProductsAd
                         editor1.putString("defaultSize",response.body().getSize());
                         editor1.commit();
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString("name",product.getProductName());
-                        bundle.putString("description",product.getDescription());
-                        //bundle.putString("rating",product.get);
-                        bundle.putDouble("defaultPrice",product.getDefaultPrice());
-                        bundle.putString("imageURL",product.getImageURL());
-                        bundle.putString("categoryId",product.getCategoryId());
-                        bundle.putString("productId",product.getProductId());
-                        bundle.putInt("totalStock",product.getTotalStock());
-                        bundle.putString("defaultMerchantId",product.getDefaultMerchantId());
+                        SharedPreferences preferences = getSharedPreferences("productInfo",MODE_PRIVATE);
+                        SharedPreferences.Editor editor2 = sharedPreferences.edit();
+                        editor2.putString("name",product.getProductName());
+                        editor2.putString("description",product.getDescription());
+                        String price = String.valueOf(product.getDefaultPrice());
+                        editor2.putFloat("defaultPrice",Float.parseFloat(price));
+                        editor2.putString("imageURL",product.getImageURL());
+                        editor2.putString("categoryId",product.getCategoryId());
+                        editor2.putString("productId",product.getProductId());
+                        editor2.putInt("totalStock",product.getTotalStock());
+                        editor2.putString("defaultMerchantId",product.getDefaultMerchantId());
+                        editor2.commit();
 
                         Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
-                        intent.putExtras(bundle);
+                       // intent.putExtras(editor2);
                         startActivity(intent);
-
-
                     }
 
                     @Override
                     public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
-
+                        Log.d("defaultMerchantData","not working");
+                        Toast.makeText(ProductListActivity.this, "defaultMerchantDataResponse Error", Toast.LENGTH_SHORT).show();
                     }
                 });
-
-//                Intent intent = new Intent(ProductListActivity.this, ProductInfoActivity.class);
-//                intent.putExtras(bundle);
-//                startActivity(intent);
-
             }
 
             @Override
             public void onFailure(Call<MerchantResponse> call, Throwable t) {
-
+                        Log.d("merchantResponse","failure");
             }
         });
-
-//        ProductInterface productInterfaceDefault = retrofit.create(ProductInterface.class);
-//        Call<DefaultProductResponse> call = productInterfaceDefault.getDefaultMerchantData(product.getDefaultMerchantId(),product.getProductId());
-//        call.enqueue(new Callback<DefaultProductResponse>() {
-//            @Override
-//            public void onResponse(Call<DefaultProductResponse> call, Response<DefaultProductResponse> response) {
-//                SharedPreferences sharedPreferences = getSharedPreferences("defaultProductData",MODE_PRIVATE);
-//                SharedPreferences.Editor editor1 = sharedPreferences.edit();
-//                editor1.putString("defaultMerchantName",response.body().getMerchantName());
-//                editor1.putString("defaultRating",String.valueOf(response.body().getProductListingRating()));
-//                editor1.putString("defaultColor",response.body().getColor());
-//                editor1.putString("defaultTheme",response.body().getTheme());
-//                editor1.putString("defaultSize",response.body().getSize());
-//                editor1.commit();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
-//
-//            }
-//        });
-        //intent.putExtra("cId",product.getImageURL());
-
 
     }
 

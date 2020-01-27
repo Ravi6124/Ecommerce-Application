@@ -33,6 +33,9 @@
     <string name="theme">Theme :</string>
     <string name="size">Size :</string>
     <string name="seller">Selected Seller :</string>
+    <string name="history">LogIn History</string>
+    <string name="loginHistory">Login History</string>
+    <string name="orderHistory">Order History</string>
 
     <string name="facebook_app_id">127131675132171</string>
     <string name="fb_login_protocol_scheme">fb127131675132171</string>

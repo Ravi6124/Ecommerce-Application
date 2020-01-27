@@ -1,5 +1,6 @@
 package com.example.ecom.cartActivity;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -106,24 +107,32 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                     callCheckout.enqueue(new Callback<CheckoutResponse>() {
                         @Override
                         public void onResponse(Call<CheckoutResponse> call, Response<CheckoutResponse> response) {
-                            String orderId = response.body().getOrderId();
-                            Toast.makeText(CartActivity.this, orderId, Toast.LENGTH_SHORT).show();
-                            Intent intent = new  Intent(CartActivity.this, CheckoutActivity.class);
-                            intent.putExtra("orderId",orderId);
-                            progressDialog.dismiss();
-                            startActivity(intent);
-                            finish();
+                            if(response.body().isStatus()) {
+                                String orderId = response.body().getOrderId();
+                                Toast.makeText(CartActivity.this, orderId, Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+                                intent.putExtra("orderId", orderId);
+                                progressDialog.dismiss();
+                                startActivity(intent);
+                                finish();
+                            }
+                            else{
+                                progressDialog.dismiss();
+                                Toast.makeText(CartActivity.this, "Cannot Place order: some items are not available right now. Try removing some of them.", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override
                         public void onFailure(Call<CheckoutResponse> call, Throwable t) {
                             progressDialog.dismiss();
-                            Toast.makeText(CartActivity.this, "order response failure: cannot checkout", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CartActivity.this, "order response failure: cannot checkout. Try again later", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
                 else{
                     progressDialog.dismiss();
+                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                    startActivityForResult(intent,3);
                     Toast.makeText(CartActivity.this, "Please Login : cannot checkout without loggin in", Toast.LENGTH_LONG).show();
 //                    new AlertDialog.Builder(context)
 //                            .setTitle("Checkout")
@@ -157,10 +166,17 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
             }
         });
 
+    }
 
 
-
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 3){
+            if(resultCode==RESULT_OK){
+                startActivity(new Intent(getApplicationContext(),CartActivity.class));
+            }
+        }
     }
 
     @Override

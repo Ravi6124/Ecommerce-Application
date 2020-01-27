@@ -16,7 +16,10 @@ public interface LoginInterface {
     @POST("login/login/googlelogin")
     Call<LoginResponse> googleLogIn(@Body AccessTokenDTO accessTokenDTO);
 
-    // TODO: 2020-01-25 login/lgoin/facebooklogin 
+    // TODO: 2020-01-25 login/lgoin/facebooklogin
+
+    @POST("login/login/facebooklogin")
+    Call<LoginResponse> facebooklogin(@Body AccessTokenDTO accessTokenDTO);
 
     @POST("login/customer")
     Call<SignUpResponse> register(@Body SignUpRequest signUpRequest);

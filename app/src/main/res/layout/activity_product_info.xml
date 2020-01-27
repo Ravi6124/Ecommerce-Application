@@ -118,6 +118,7 @@
         android:layout_marginTop="84dp"
         android:text="@string/description"
         android:textStyle="bold"
+        android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,8 +127,8 @@
 
     <TextView
         android:id="@+id/color"
-        android:layout_width="68dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="46dp"
         android:layout_marginTop="32dp"
         android:text="TextView"
@@ -150,8 +151,8 @@
 
     <TextView
         android:id="@+id/theme"
-        android:layout_width="68dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="46dp"
         android:layout_marginTop="76dp"
         android:text="TextView"
@@ -174,8 +175,8 @@
 
     <TextView
         android:id="@+id/size"
-        android:layout_width="68dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="46dp"
         android:layout_marginTop="124dp"
         android:text="TextView"

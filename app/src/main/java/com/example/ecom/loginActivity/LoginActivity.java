@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ import com.example.ecom.loginActivity.modules.LoginResponse;
 import com.example.ecom.loginActivity.modules.login.LoginRequest;
 import com.example.ecom.loginActivity.modules.signup.SignUpRequest;
 import com.example.ecom.loginActivity.modules.signup.SignUpResponse;
+import com.example.ecom.loginhistoryActivity.LoginHistoryActivity;
+import com.example.ecom.orderHistory.OrderHistoryActivity;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -64,6 +67,8 @@ public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
     private String userId;
     Retrofit retrofit;
+    private Button logHistory;
+    private Button orderHistory;
 
     {
         RC_SIGN_IN = 1;
@@ -86,6 +91,23 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        logHistory = findViewById(R.id.login_history);
+        logHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, LoginHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        orderHistory = findViewById(R.id.order_history);
+        orderHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, OrderHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
         //check for already logged user
@@ -119,8 +141,40 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code loginResult has the access token
+                sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                final SharedPreferences.Editor editor = sharedPreferences.edit();
+                //editor.putString("email",EMAIL);
+
                 String accessToken = loginResult.getAccessToken().getToken();
-                updateUI(true);
+                AccessTokenDTO accessTokenDTO = new AccessTokenDTO(accessToken,"customer",userId, "facebook");
+                RetrofitClass retrofitLogin = new RetrofitClass();
+                Retrofit retrofit = retrofitLogin.getRetrofit();
+                LoginInterface loginInterface = retrofit.create(LoginInterface.class);
+                Call<LoginResponse> call = loginInterface.facebooklogin(accessTokenDTO);
+                call.enqueue(new Callback<LoginResponse>() {
+                    @Override
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        String userId = response.body().getUserId();
+                        editor.putString("userId",userId);
+                        editor.putString("email",EMAIL);
+                        // TODO: 2020-01-25  do commit here and update UI here only
+                        editor.commit();
+                        updateUI(true);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        setResult(RESULT_OK,intent);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, "Authorization not responding", Toast.LENGTH_SHORT).show();
+                        //Log.d("Authorization","not responding");
+                    }
+                });
+
+                //AccessTokenDTO
+                //updateUI(true);
                 Toast.makeText(LoginActivity.this, "facebook logged in", Toast.LENGTH_SHORT).show();
             }
 
@@ -157,42 +211,55 @@ public class LoginActivity extends AppCompatActivity {
                 EditText editTextPass = findViewById(R.id.password);
                 password = editTextPass.getText().toString();
 
-                // todo send data to backend for authentication
-
-                LoginRequest loginRequest = new LoginRequest(userName,password,"customer",userId);
-                RetrofitClass retrofitLogin = new RetrofitClass();
-                retrofit = retrofitLogin.getRetrofit();
-                LoginInterface loginInterface = retrofit.create(LoginInterface.class);
-                Call<LoginResponse> call = loginInterface.customLogin(loginRequest);
-                call.enqueue(new Callback<LoginResponse>() {
-                    @Override
-                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                        //String user = response.body().getUserId();
-                        int status = response.body().getStatusCode();
-                        if(status == 1000){
-                            SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("userId",response.body().getUserId());
-                            editor.putString("email",response.body().getEmailAddress());
-                            editor.commit();
-                            Log.d("login","true");
-                            updateUI(true);
-
-                            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                            setResult(RESULT_OK,intent);
-                            startActivity(intent);
-                            finish();
-                        }
-                        else {
-                            Toast.makeText(LoginActivity.this, "invalid credentials", Toast.LENGTH_SHORT).show();
-                        }
+                if(userName.equals("")){
+                    if(password.equals("")){
+                        editTextEmail.requestFocus();
+                        editTextPass.requestFocus();
                     }
+                    else
+                        editTextEmail.requestFocus();
+                }
+                else if(password.equals("")){
+                    editTextPass.requestFocus();
+                }
+                else {
 
-                    @Override
-                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                    // todo send data to backend for authentication
 
-                    }
-                });
+                    LoginRequest loginRequest = new LoginRequest(userName, password, "customer", userId);
+                    RetrofitClass retrofitLogin = new RetrofitClass();
+                    retrofit = retrofitLogin.getRetrofit();
+                    LoginInterface loginInterface = retrofit.create(LoginInterface.class);
+                    Call<LoginResponse> call = loginInterface.customLogin(loginRequest);
+                    call.enqueue(new Callback<LoginResponse>() {
+                        @Override
+                        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                            //String user = response.body().getUserId();
+                            int status = response.body().getStatusCode();
+                            if (status == 1000) {
+                                SharedPreferences sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("userId", response.body().getUserId());
+                                editor.putString("email", response.body().getEmailAddress());
+                                editor.commit();
+                                Log.d("login", "true");
+                                updateUI(true);
+
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                setResult(RESULT_OK, intent);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "invalid credentials", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<LoginResponse> call, Throwable t) {
+
+                        }
+                    });
+                }
             }
         });
 
@@ -205,21 +272,33 @@ public class LoginActivity extends AppCompatActivity {
                 EditText editTextPass = findViewById(R.id.password);
                 password = editTextPass.getText().toString();
 
-                //send data to backend for registration
-                SignUpRequest request = new SignUpRequest(userName,password,"customer");
-                RetrofitClass retrofitLogin = new RetrofitClass();
-                retrofit = retrofitLogin.getRetrofit();
-                LoginInterface loginInterface = retrofit.create(LoginInterface.class);
-                Call<SignUpResponse> call = loginInterface.register(request);
-                call.enqueue(new Callback<SignUpResponse>() {
-                    @Override
-                    public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if(userName.equals("")){
+                    if(password.equals("")){
+                        editTextEmail.requestFocus();
+                        editTextPass.requestFocus();
+                    }
+                    else
+                        editTextEmail.requestFocus();
+                }
+                else if(password.equals("")){
+                    editTextPass.requestFocus();
+                }else {
 
-                        //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
-                        int status = response.body().getStatusCode();
-                        if(status == 1000){
-                           // updateUI(true);
-                        //Data data = response.body().getData();
+                    //send data to backend for registration
+                    SignUpRequest request = new SignUpRequest(userName, password, "customer");
+                    RetrofitClass retrofitLogin = new RetrofitClass();
+                    retrofit = retrofitLogin.getRetrofit();
+                    LoginInterface loginInterface = retrofit.create(LoginInterface.class);
+                    Call<SignUpResponse> call = loginInterface.register(request);
+                    call.enqueue(new Callback<SignUpResponse>() {
+                        @Override
+                        public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+
+                            //Toast.makeText(LoginActivity.this, "", Toast.LENGTH_SHORT).show();
+                            int status = response.body().getStatusCode();
+                            if (status == 1000) {
+                                // updateUI(true);
+                                //Data data = response.body().getData();
 //                        sharedPreferences = context.getSharedPreferences(
 //                                    getString(R.string.preference_file_key_signup), Context.MODE_PRIVATE);
 //
@@ -228,19 +307,19 @@ public class LoginActivity extends AppCompatActivity {
 //                            editor.putString("userId",String.valueOf(data.getUserId()));
 //                            //editor.commit will write to persistence data and apply will handle in the background
 //                            editor.apply();
-                            //String message = response.body().getMessage();
-                            Toast.makeText(LoginActivity.this, "Registration Success : You can login now", Toast.LENGTH_SHORT).show();
+                                //String message = response.body().getMessage();
+                                Toast.makeText(LoginActivity.this, "Registration Success : You can login now", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Registration Failed : Try other methods", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                        else{
-                            Toast.makeText(LoginActivity.this, "Registration Failed : Try other methods", Toast.LENGTH_SHORT).show();
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SignUpResponse> call, Throwable t) {
-                        Log.d("SignUp Service","Callback failure");
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                            Log.d("SignUp Service", "Callback failure");
+                        }
+                    });
+                }
             }
         });
 
@@ -333,7 +412,7 @@ public class LoginActivity extends AppCompatActivity {
             //editor.commit();
             // TODO: 2020-01-22 send the token to backend
             String token = account.getIdToken();
-            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken(),"customer",userId);
+            AccessTokenDTO accessTokenDTO = new AccessTokenDTO(account.getIdToken(),"customer",userId,"google");
             RetrofitClass retrofitLogin = new RetrofitClass();
             Retrofit retrofit = retrofitLogin.getRetrofit();
             LoginInterface loginInterface = retrofit.create(LoginInterface.class);
@@ -416,6 +495,8 @@ public class LoginActivity extends AppCompatActivity {
             findViewById(R.id.email).setVisibility(View.GONE);
             findViewById(R.id.password).setVisibility(View.GONE);
             findViewById(R.id.facebook_login_button).setVisibility(View.GONE);
+            findViewById(R.id.login_history).setVisibility(View.VISIBLE);
+            findViewById(R.id.order_history).setVisibility(View.VISIBLE);
             //findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
@@ -428,6 +509,9 @@ public class LoginActivity extends AppCompatActivity {
             findViewById(R.id.email).setVisibility(View.VISIBLE);
             findViewById(R.id.password).setVisibility(View.VISIBLE);
             findViewById(R.id.facebook_login_button).setVisibility(View.VISIBLE);
+
+            findViewById(R.id.login_history).setVisibility(View.GONE);
+            findViewById(R.id.order_history).setVisibility(View.GONE);
 
             //findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }

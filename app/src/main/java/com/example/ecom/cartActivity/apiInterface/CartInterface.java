@@ -12,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface CartInterface {
@@ -20,6 +21,7 @@ public interface CartInterface {
     Call<CartProductRevised> getFromCart(@Path("userId") @NonNull String userId);
 
     //@DELETE("cart/item")
-    @HTTP(method = "DELETE", path = "/cartandorder/cart/reduceitem", hasBody = true)
+    //@HTTP(method = "DELETE", path = "/cartandorder/cart/reduceitem", hasBody = true)
+    @POST("cartandorder/cart/reduceitem")
     Call<RemoveFromCart> removeFromCart(@Body RemoveFromCartRequest removeFromCartRequest);
 }

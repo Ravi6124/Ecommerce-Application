@@ -37,7 +37,7 @@ public class ContentItem{
 	private String productName;
 
 	@SerializedName("categoryId")
-	private Object categoryId;
+	private String categoryId;
 
 	public void setItemId(Object itemId){
 		this.itemId = itemId;
@@ -119,11 +119,11 @@ public class ContentItem{
 		return productName;
 	}
 
-	public void setCategoryId(Object categoryId){
+	public void setCategoryId(String categoryId){
 		this.categoryId = categoryId;
 	}
 
-	public Object getCategoryId(){
+	public String getCategoryId(){
 		return categoryId;
 	}
 

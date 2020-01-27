@@ -13,14 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".splashActivity.SplashActivity" android:theme="@style/splash">
-
+        <activity android:name=".orderHistory.OrderHistoryActivity"></activity>
+        <activity android:name=".loginhistoryActivity.LoginHistoryActivity" />
+        <activity
+            android:name=".splashActivity.SplashActivity"
+            android:theme="@style/splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity android:name=".checkoutActivity.CheckoutActivity" />
         <activity android:name=".facebookLogin.FacebookLoginActivity" />
@@ -49,11 +51,13 @@
         <activity
             android:name=".homeActivity.MainActivity"
             android:windowSoftInputMode="adjustPan">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
 
         <meta-data

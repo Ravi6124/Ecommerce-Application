@@ -21,7 +21,7 @@ public interface ProductInterface {
     @GET("merchant/merchant/getMerchantById{merchantId}")
     Call<MerchantResponse> getMerchantById(@Path("merchantId") String merchantId);
 
-    @GET("merchant/productListingController/getDefaultMerchantData/{merchantId}/{productId}")
+    @GET("merchant/productListingController/getSearchProductExtraDetails/{merchantId}/{productId}")
     Call<DefaultProductResponse> getDefaultMerchantData(@Path("merchantId") String mId, @Path("productId") String pId);
 
 }

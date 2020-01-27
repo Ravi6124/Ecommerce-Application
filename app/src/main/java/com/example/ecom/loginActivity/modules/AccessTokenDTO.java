@@ -21,7 +21,6 @@ public class AccessTokenDTO {
 
     {
         type = "android";
-        loginSource = "google";
     }
 
     public String getRole() {
@@ -32,10 +31,11 @@ public class AccessTokenDTO {
         this.role = role;
     }
 
-    public AccessTokenDTO(String accessToken, String role, String guestId) {
+    public AccessTokenDTO(String accessToken, String role, String guestId,String loginSource) {
         this.accessToken = accessToken;
         this.role = role;
         this.guestId = guestId;
+        this.loginSource = loginSource;
     }
 
     public String getAccessToken() {

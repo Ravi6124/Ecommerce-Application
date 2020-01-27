@@ -15,12 +15,18 @@ import android.widget.Toast;
 import com.example.ecom.R;
 import com.example.ecom.RetrofitClass;
 import com.example.ecom.productInfoActivity.ProductInfoActivity;
+import com.example.ecom.productListActivity.apiInterface.ProductInterface;
+import com.example.ecom.productListActivity.models.DefaultProductResponse;
+import com.example.ecom.productListActivity.models.Product;
+import com.example.ecom.productListActivity.models.ProductPage;
 import com.example.ecom.searchableActivity.adaptor.SearchAdaptor;
 import com.example.ecom.searchableActivity.apiInterface.SearchInterface;
 import com.example.ecom.searchableActivity.models.ContentItem;
+import com.example.ecom.searchableActivity.models.DefaultSearchResponse;
 import com.example.ecom.searchableActivity.models.SearchResponse;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -102,28 +108,135 @@ public class SearchableActivity extends AppCompatActivity implements SearchAdapt
     }
 
     @Override
-    public void onClick(ContentItem product) {
+    public void onClick(final ContentItem product) {
 
-        Intent intent = new Intent(SearchableActivity.this, ProductInfoActivity.class);
+        final Intent intent = new Intent(SearchableActivity.this, ProductInfoActivity.class);
         //create bundle
         SharedPreferences shared = getSharedPreferences("productInfo",MODE_PRIVATE);
         SharedPreferences.Editor editor = shared.edit();
         editor.putString("name",product.getProductName());
         editor.putString("description",product.getDescription());
         //editor.putString("defaultMerchantId",product.getMerchantId());
-        String price = String.valueOf(product.getPrice());
-        editor.putString("defaultPrice",price);
+        String priceString = String.valueOf(product.getPrice());
+        Float price = Float.parseFloat(priceString);
+        editor.putFloat("defaultPrice",price);
 //        bundle.putDouble("average",product.getAverageProductRating());
 //        bundle.putInt("numberOfRatings",product.getNumberOfRatings());
         editor.putString("imageURL",product.getImageURL());
         //editor.putString("categoryId",product.getCategoryId());
         editor.putString("productId",product.getProductId());
-        editor.putString("color",product.getColor());
-        editor.putString("size",product.getSize());
-        editor.putString("theme",product.getTheme());
+        editor.commit();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = sharedPreferences.edit();
+        String color = product.getColor();
+        editor1.putString("defaultColor",product.getColor());
+        editor1.putString("defaultSize",product.getSize());
+        String theme = product.getTheme();
+        editor1.putString("defaultTheme",product.getTheme());
         //editor.putInt("totalStock",product.getTotalStock());
-        editor.apply();
-        startActivity(intent);
+        editor1.commit();
+        String categoryId = product.getCategoryId();
+//
+//        RetrofitClass retrofitClass = new RetrofitClass();
+//        Retrofit retrofit = retrofitClass.getRetrofit();
+//        SearchInterface searchInterface = retrofit.create(SearchInterface.class);
+//        Call<DefaultSearchResponse> call = searchInterface.getSearchProductExtraDetails(product.getProductId());
+//        call.enqueue(new Callback<DefaultSearchResponse>() {
+//            @Override
+//            public void onResponse(Call<DefaultSearchResponse> call, Response<DefaultSearchResponse> response) {
+//                SharedPreferences shared = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+//                SharedPreferences.Editor editor = shared.edit();
+//                editor.putString("defaultMerchantId",response.body().getMerchantId());
+//                editor.putString("defaultMerchantName",response.body().getMerchantName());
+//                editor.putString("defaultRating",String.valueOf(response.body().getProductListingRating()));
+//                String productId = shared.getString("productId","");
+//                editor.commit();
+//
+//                RetrofitClass retrofitClass1 = new RetrofitClass();
+//                Retrofit retrofit1 = retrofitClass1.getRetrofit();
+//                ProductInterface productInterfaceDefault = retrofit1.create(ProductInterface.class);
+//                Call<DefaultProductResponse> callDefault = productInterfaceDefault.getDefaultMerchantData(response.body().getMerchantId(),productId);
+//                callDefault.enqueue(new Callback<DefaultProductResponse>() {
+//                    @Override
+//                    public void onResponse(Call<DefaultProductResponse> call, Response<DefaultProductResponse> response) {
+//                        SharedPreferences sharedPreferences = getSharedPreferences("productInfo",MODE_PRIVATE);
+//                        SharedPreferences.Editor editor1 = sharedPreferences.edit();
+//                        editor1.putString("defaultColor",response.body().getColor());
+//                        editor1.putString("defaultTheme",response.body().getSize());
+//                        editor1.putString("defaultSize",response.body().getSize());
+//                        editor1.commit();
+//                        startActivity(intent);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
+//
+//                    }
+//                });
+//            }
+
+//            @Override
+//            public void onFailure(Call<DefaultSearchResponse> call, Throwable t) {
+//
+//            }
+//        });
+
+
+
+
+//        int page =0;
+//        int size =2;
+        RetrofitClass retrofitClass = new RetrofitClass();
+        Retrofit retrofit =  retrofitClass.getRetrofit();
+        SearchInterface searchInterface = retrofit.create(SearchInterface.class);
+        Call<Product> call = searchInterface.getProductById(product.getProductId());
+        call.enqueue(new Callback<Product>() {
+            @Override
+            public void onResponse(Call<Product> call, Response<Product> response) {
+                String defaultMerchantId = response.body().getDefaultMerchantId();
+                SharedPreferences sharedPreferences = getSharedPreferences("productInfo",MODE_PRIVATE);
+                SharedPreferences.Editor editor1 = sharedPreferences.edit();
+                editor1.putString("defaultMerchantId",defaultMerchantId);
+                editor1.commit();
+
+                RetrofitClass retrofitClass1 = new RetrofitClass();
+                Retrofit retrofit1 = retrofitClass1.getRetrofit();
+                ProductInterface productInterface = retrofit1.create(ProductInterface.class);
+                Call<DefaultProductResponse> call1 = productInterface.getDefaultMerchantData(defaultMerchantId,product.getProductId());
+                call1.enqueue(new Callback<DefaultProductResponse>() {
+                    @Override
+                    public void onResponse(Call<DefaultProductResponse> call, Response<DefaultProductResponse> response) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("defaultProductData",MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = sharedPreferences.edit();
+                        editor1.putString("defaultMerchantName",response.body().getMerchantName());
+                        editor1.putString("defaultRating",String.valueOf(response.body().getProductListingRating()));
+//                        editor1.putString("defaultColor",response.body().getColor());
+//                        editor1.putString("defaultTheme",response.body().getTheme());
+//                        String theme = response.body().getTheme();
+//                        String color = response.body().getColor();
+//                        String size = response.body().getSize();
+//                        editor1.putString("defaultSize",response.body().getSize());
+                        editor1.commit();
+
+                        Intent intent1 = new Intent(getApplicationContext(),ProductInfoActivity.class);
+                        startActivity(intent1);
+                    }
+
+                    @Override
+                    public void onFailure(Call<DefaultProductResponse> call, Throwable t) {
+                        Log.d("getDefaultMerchantData","callback failure");
+
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<Product> call, Throwable t) {
+
+            }
+        });
 
     }
+
 }

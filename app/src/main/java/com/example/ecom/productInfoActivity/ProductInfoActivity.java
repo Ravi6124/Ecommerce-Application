@@ -38,13 +38,6 @@ import retrofit2.Retrofit;
 
 public class ProductInfoActivity extends AppCompatActivity {
 
-    //defining all the views in the Layout
-//    private TextView tvProductName;
-//    private ImageView ivProductImage;
-//    private TextView tvProductDescription;
-//    private TextView tvDefaultProductPrice;
-//    private Button btnAddTocart;
-//    private Button btnBuyNow;
     private  String userId;
     private  SharedPreferences shared;
 
@@ -85,9 +78,6 @@ public class ProductInfoActivity extends AppCompatActivity {
         final double defPrice;
 
         shared = getSharedPreferences("productInfo", MODE_PRIVATE);
-
-//        if (extras != null) {
-            //Storing the values from bundle in the local
             name = shared.getString("name","");
             productId = shared.getString("productId","");
             defaultMerchantId = shared.getString("defaultMerchantId","");
@@ -97,21 +87,10 @@ public class ProductInfoActivity extends AppCompatActivity {
             defPrice = shared.getFloat("defaultPrice",0);
             categoryId = shared.getString("categoryId","");
 
-//            Bundle shared1 = getIntent().getExtras();
-//            name = shared1.getString("name","");
-//             productId = shared1.getString("productId","");
-//             defaultMerchantId = shared1.getString("defaultMerchantId","");
-//             merchantName = shared1.getString("defaultMerchantName","");
-//             description = shared1.getString("description","");
-//            imageURL  = shared1.getString("imageURL","");
-//            defPrice = shared1.getDouble("defaultPrice");
-//            categoryId = shared1.getString("categoryId","");
-            //Setting the page components from the values recieved from the bundle
 
             tvProductName.setText(name);
             Glide.with(this).load(imageURL).into(ivProductImage);
             tvProductDescription.setText(description);
-//            defaultMerchantName.setText(merchantName);
             tvDefaultProductPrice.setText("Rs." +defPrice);
 
             SharedPreferences defaultPref = getSharedPreferences("defaultProductData",MODE_PRIVATE);
@@ -136,14 +115,6 @@ public class ProductInfoActivity extends AppCompatActivity {
             size.setText(sizeDefault);
 
 
-
-//        }
-
-//        else{
-//            Toast.makeText(ProductInfoActivity.this,"OOPs Product Not found",Toast.LENGTH_LONG).show();
-//        }
-
-
         btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,8 +129,7 @@ public class ProductInfoActivity extends AppCompatActivity {
                 AddProductToCartRequest addProductToCart = new AddProductToCartRequest(userId,cartProduct);
 
                 // TODO: 2020-01-22 for now different retrofit class for differnet services 
-//                RetrofitClass retrofitClass = new RetrofitClass();
-//                Retrofit retrofit = retrofitClass.getRetrofit();
+
                 RetrofitClass retrofitCart = new RetrofitClass();
                 Retrofit retrofit = retrofitCart.getRetrofit();
                 ProductInfoInterface productInfoInterface = retrofit.create(ProductInfoInterface.class);
@@ -199,9 +169,6 @@ public class ProductInfoActivity extends AppCompatActivity {
                 CartProduct cartProduct = new CartProduct(1,imageURL,productId,merchantId,price,name);
                 AddProductToCartRequest addProductToCart = new AddProductToCartRequest(userId,cartProduct);
 
-                // TODO: 2020-01-22 for now different retrofit class for differnet services
-//                RetrofitClass retrofitClass = new RetrofitClass();
-//                Retrofit retrofit = retrofitClass.getRetrofit();
                 RetrofitClass retrofitCart = new RetrofitClass();
                 Retrofit retrofit = retrofitCart.getRetrofit();
                 ProductInfoInterface productInfoInterface = retrofit.create(ProductInfoInterface.class);
